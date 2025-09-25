@@ -1,21 +1,21 @@
-import React from "react"
+import React, { useRef } from "react"
+import { useHelper } from "@react-three/drei"
+import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
 
-const LargeSource = ({
-  position = [0, 2, 0],
-  rotation = [-Math.PI / 2, 0, 0],
-  color = "white",
-  intensity = 1,
-  width = 5,
-  height = 5
-}) => {
+const LargeSource = ({ params }) => {
+  if (!params) return null
+
+  const lightRef = useRef()
+  useHelper(lightRef, RectAreaLightHelper, params.color)
+
   return (
     <rectAreaLight
-      position={position}
-      rotation={rotation}
-      color={color}
-      intensity={intensity}
-      width={width}
-      height={height}
+      ref={lightRef}
+      position={params.position}
+      rotation={params.rotation}
+      color="#FFFFFF"
+      width={params.width}
+      height={params.height}
     />
   )
 }

@@ -1,18 +1,18 @@
-import React from "react"
-import { PointLightHelper } from "three"
+import React, { useRef } from "react"
 import { useHelper } from "@react-three/drei"
+import { PointLightHelper } from "three"
 
-const PointSource = ({ position = [0, 2, 0], color = "white", intensity = 1, distance = 10 }) => {
-  const lightRef = React.useRef()
-  useHelper(lightRef, PointLightHelper, 0.5, "yellow")
+const PointSource = ({ params }) => {
+  if (!params) return null
+
+  const lightRef = useRef()
+  useHelper(lightRef, PointLightHelper, params.helperSize || 0.5, params.color)
 
   return (
     <pointLight
       ref={lightRef}
-      position={position}
-      color={color}
-      intensity={intensity}
-      distance={distance}
+      position={params.position}
+      color="#FFFFFF"
     />
   )
 }

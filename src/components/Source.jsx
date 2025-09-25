@@ -1,12 +1,12 @@
 import PointSource from "./sources/PointSource";
 import LargeSource from "./sources/LargeSource";
 
-const Source = ({ source }) => {
-  switch (source.type) {
+const Source = ({ src }) => {
+  switch (src.type) {
     case "Point":
-      return <PointSource params={source.params} />;
+      return <PointSource params={src.params} />;
     case "Large":
-      return <LargeSource params={source.params} />;
+      return <LargeSource params={src.params} />;
     default:
       return null;
   }
