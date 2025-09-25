@@ -12,19 +12,20 @@ import CustomAxes from "../utils/Axes";
 const data = {
   scene: {
     geometry: {
-      type: "Cylindric",
-      params: {
-        size: 4,
-        height: 2,
-        position: [0, 1, 0],
-      },
-      // type: "Parabolic",
+      // type: "Cylindric",
       // params: {
-      //   f_x: 0.5,
-      //   f_y: 0.8,
-      //   size: 3,
-      //   position: [0, 1.4, 0],
+      //   size: 4,
+      //   height: 2,
+      //   position: [0, 1, 0],
       // },
+      type: "Parabolic",
+      params: {
+        f_x: 0.5,
+        f_y: 0.8,
+
+        size: 3,
+        position: [0, 1.4, 0],
+      },
     },
   },
   source: {
@@ -39,7 +40,7 @@ const data = {
     params: {
       position: [0, 2, -150000000],
       intensity: 1,
-    },
+    }
   },
 };
 
@@ -55,7 +56,7 @@ export default function Scene() {
           data.source,
           geomRef.current,
           data.scene.geometry,
-          75
+          750
         );
         if (mounted) setRays(generated);
       } else {
