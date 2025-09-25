@@ -1,10 +1,13 @@
-import React, { useRef, useState, useEffect } from "react"
-import { Canvas } from "@react-three/fiber"
-import { OrbitControls } from "@react-three/drei"
-import Geometry from "./Geometry"
-import Source from "./Source"
-import Ray from "./Ray"
-import { generateRays } from "../utils/generateRays"
+import React, { useRef, useState, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import Geometry from "./Geometry";
+import Source from "./Source";
+import Ray from "./Ray";
+import { generateRays } from "../utils/generateRays";
+import CustomAxes from "../utils/Axes";
+
+
 
 const data = {
   scene: {
@@ -13,7 +16,7 @@ const data = {
       params: {
         size: 4,
         height: 2,
-        position: [0, 0, 0],
+        position: [0, 1, 0],
       },
       // type: "Parabolic",
       // params: {
@@ -38,34 +41,42 @@ const data = {
       intensity: 1,
     },
   },
-}
+};
 
 export default function Scene() {
-  const geomRef = useRef(null)
-  const [rays, setRays] = useState([])
+  const geomRef = useRef(null);
+  const [rays, setRays] = useState([]);
 
   useEffect(() => {
-    let mounted = true
+    let mounted = true;
     const tryGenerate = () => {
       if (geomRef.current) {
-        const generated = generateRays(data.source, geomRef.current, data.scene.geometry, 100)
-        if (mounted) setRays(generated)
+        const generated = generateRays(
+          data.source,
+          geomRef.current,
+          data.scene.geometry,
+          100
+        );
+        if (mounted) setRays(generated);
       } else {
-        setTimeout(tryGenerate, 50)
+        setTimeout(tryGenerate, 50);
       }
-    }
-    tryGenerate()
+    };
+    tryGenerate();
     return () => {
-      mounted = false
-    }
-  }, [])
+      mounted = false;
+    };
+  }, []);
 
   return (
-    <Canvas camera={{ position: [8, 2, 12], fov: 50 }}>
+    <Canvas
+      style={{ background: "linear-gradient(to bottom, #5e5977ff, #1b1b30ff)" }}
+      camera={{ position: [8, 2, 12], fov: 50 }}
+    >
       <ambientLight intensity={0.3} />
-      <directionalLight position={[0, 2, -150000000]} intensity={1} />
+      <directionalLight position={[0, 2000, -150000000]} intensity={1} />
       <OrbitControls />
-      <axesHelper args={[5]} />
+      <CustomAxes size={10} divisions={50} />
 
       <Geometry ref={geomRef} geom={data.scene.geometry} />
       <Source src={data.source} />
@@ -73,5 +84,5 @@ export default function Scene() {
         <Ray key={r.id} ray={r} />
       ))}
     </Canvas>
-  )
+  );
 }
