@@ -7,7 +7,7 @@ const Cylindric = ({ params }) => {
     <mesh position={position} rotation={rotation}>
       <cylinderGeometry args={[radius, radius, height, 64, 1]} />
       <meshStandardMaterial
-        color="#4A90E2"
+        color="#E67E22"
         metalness={0.3}
         roughness={0.6}
         opacity={0.7}

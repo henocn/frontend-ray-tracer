@@ -1,20 +1,42 @@
+import React from "react"
+import * as THREE from "three"
+import { extend } from "@react-three/fiber"
+import { ParametricGeometry } from "three/examples/jsm/geometries/ParametricGeometry.js"
+import { Edges } from "@react-three/drei"
 
-const Parabolic = ({params}) => {
-  const { focal = 2, size = 3, segments = 32 } = params;
+extend({ ParametricGeometry })
+
+const Parabolic = ({ params }) => {
+  if (!params) return null
+
+  const {
+    f_x = 0.5,
+    f_y = 0.5,
+    size = 3,
+    segments = 32,
+    position = [0, 0, 0]
+  } = params
 
   const parabola = (u, v, target) => {
-    const x = (u - 0.5) * size;
-    const y = (v - 0.5) * size;
-    const z = (x * x + y * y) / (4 * focal);
-    target.set(x, y, z);
-  };
+    const x = (u - 0.5) * size
+    const y = (v - 0.5) * size
+    const z = (x * x) / (4 * f_x) + (y * y) / (4 * f_y)
+    target.set(x, y, z)
+  }
 
   return (
-    <mesh position={params.position}>
+    <mesh position={position}>
       <parametricGeometry args={[parabola, segments, segments]} />
-      <meshStandardMaterial color="#E67E22" wireframe />
+      <meshStandardMaterial
+        color="#E67E22"
+        metalness={0.3}
+        roughness={0.6}
+        transparent={true}
+        opacity={0.8}
+      />
+      <Edges color="black" />
     </mesh>
-  );
-};
+  )
+}
 
-export default Parabolic;
+export default Parabolic
