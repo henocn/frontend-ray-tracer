@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { data } from "../data";
+import data from "../data.json";
 import Geometry from "./Geometry";
 import Source from "./Source";
 import Ray from "./Ray";
