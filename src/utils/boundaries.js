@@ -1,4 +1,3 @@
-
 export function getGeometryBoundaries(type, params) {
   switch (type) {
     case "Parabolic": {
@@ -25,7 +24,43 @@ export function getGeometryBoundaries(type, params) {
       return { xmin, xmax, ymin, ymax, zmin, zmax }
     }
 
-    // Tu pourras ajouter d’autres types (Sphere, Cube, etc.)
+    case "Cylindric": {
+      const {
+        radius = 1,
+        height = 2,
+        position = [0, 0, 0],
+      } = params
+      const [px, py, pz] = position
+
+      const xmin = px - radius
+      const xmax = px + radius
+      const ymin = py - radius
+      const ymax = py + radius
+      const zmin = pz - height / 2
+      const zmax = pz + height / 2
+
+      return { xmin, xmax, ymin, ymax, zmin, zmax }
+    }
+
+    case "RingArray": {
+      const {
+        radius = 3,
+        elementSize = 0.2,
+        position = [0, 0, 0],
+      } = params
+      const [px, py, pz] = position
+
+      const extent = radius + elementSize
+      const xmin = px - extent
+      const xmax = px + extent
+      const ymin = py - extent
+      const ymax = py + extent
+      const zmin = pz - elementSize
+      const zmax = pz + elementSize
+
+      return { xmin, xmax, ymin, ymax, zmin, zmax }
+    }
+
     default:
       throw new Error(`Unsupported geometry type: ${type}`)
   }
