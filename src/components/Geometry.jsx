@@ -1,20 +1,20 @@
-import Cylindric from "./geometries/Cylindric";
-import Parabolic from "./geometries/Parabolic";
-import RingArray from "./geometries/RingArray";
-import React from "react";
+import React, { forwardRef } from "react"
+import Cylindric from "./geometries/Cylindric"
+import Parabolic from "./geometries/Parabolic"
+import RingArray from "./geometries/RingArray"
 
-const Geometry = ({ geom }) => {
+const Geometry = forwardRef(({ geom }, ref) => {
+  if (!geom) return null
   switch (geom.type) {
     case "Cylindric":
-      return <Cylindric params={geom.params} />;
+      return <Cylindric ref={ref} params={geom.params} />
     case "Parabolic":
-      return <Parabolic params={geom.params} />;
+      return <Parabolic ref={ref} params={geom.params} />
     case "RingArray":
-      return <RingArray params={geom.params} />;
+      return <RingArray ref={ref} params={geom.params} />
     default:
-      return null;
+      return null
   }
-}
+})
 
-export default Geometry;
-
+export default Geometry

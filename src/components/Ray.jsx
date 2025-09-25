@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import React, { useMemo } from "react"
 import * as THREE from "three"
 
 const Ray = ({ ray }) => {
@@ -9,7 +9,7 @@ const Ray = ({ ray }) => {
 
   return (
     <line geometry={geometry}>
-      <lineBasicMaterial color={ray.color || "white"} />
+      <lineBasicMaterial color={ray.color || "red"} />
     </line>
   )
 }
