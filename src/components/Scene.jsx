@@ -17,11 +17,21 @@ const data = {
       },
     },
   },
+  // source: {
+  //   type: "Point",
+  //   params: {
+  //     position: [0, 2, -500],
+  //   },
+  // },
   source: {
-    id: "src1",
-    type: "LargeSource",
-    position: [0, 2, -5],
-    direction: [0, 0, 1],
+    type: "Large",
+    params: {
+      position: [0, 2, -20],
+      width: 2,
+      height: 2,
+      color: "#FFFFFF",
+      intensity: 1,
+    },
   },
   rays: [
     {
@@ -31,7 +41,7 @@ const data = {
         [0, 1, -2],
         [1, 0, 1],
         [2, -1, 3],
-      ]
+      ],
     },
     {
       id: "ray2",
@@ -40,18 +50,17 @@ const data = {
         [-2, 0, -2],
         [0, 0, 0],
         [2, 1, 2],
-      ]
+      ],
     },
   ],
 };
 
 // Scène principale
 export default function Scene() {
-  console.log(data);
   return (
     <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
-      <ambientLight />
-      <pointLight position={[10, 10, 10]} />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[5, 10, 5]} intensity={1} />
       <OrbitControls />
       {/* Géométries */}
       <Geometry geom={data.scene.geometry} />
