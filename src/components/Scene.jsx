@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Geometry from "./Geometry";
 import Source from "./Source";
-import Rays from "./Rays";
+import Ray from "./Ray";
 
 const data = {
   "scene": {

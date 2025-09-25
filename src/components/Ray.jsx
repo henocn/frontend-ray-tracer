@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import * as THREE from "three";
     
 
-const Rays = ({ ray }) => {
+const Ray = ({ ray }) => {
   const points = useMemo(
     () => ray.points.map((p) => new THREE.Vector3(...p)),
     [ray]
@@ -15,4 +15,4 @@ const Rays = ({ ray }) => {
   );
 };
 
-export default Rays;
+export default Ray;
