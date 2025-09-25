@@ -1,35 +1,13 @@
 import React, { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
 import { data } from "../data";
 import Geometry from "./Geometry";
+import Source from "./Source";
+import Ray from "./Ray";
 
 
 
-function Source({ src }) {
-  return (
-    <mesh position={src.position}>
-      <sphereGeometry args={[0.1, 16, 16]} />
-      <meshStandardMaterial color="yellow" emissive="orange" />
-    </mesh>
-  );
-}
-
-// Composant pour afficher un rayon
-function Ray({ ray }) {
-  const points = useMemo(
-    () => ray.points.map((p) => new THREE.Vector3(...p)),
-    [ray]
-  );
-
-  return (
-    <line>
-      <bufferGeometry attach="geometry" setFromPoints={points} />
-      <lineBasicMaterial color={ray.color || "red"} />
-    </line>
-  );
-}
 
 // Scène principale
 export default function Scene() {
