@@ -1,11 +1,11 @@
 import React from 'react'
 
-const { radius = 3, count = 8, elementSize = 0.2, position = [0, 0, 0] } = params
-const angleStep = (2 * Math.PI) / count
 const RingArray = ({ params }) => {
+  const angleStep = (2 * Math.PI) / params.count
+
   return (
-    <group position={position}>
-      {Array.from({ length: count }).map((_, i) => {
+    <group position={params.position}>
+      {Array.from({ length: params.count }).map((_, i) => {
         const angle = i * angleStep
         const x = radius * Math.cos(angle)
         const y = radius * Math.sin(angle)
