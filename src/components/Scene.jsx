@@ -23,7 +23,7 @@ const data = {
       //   f_x: 0.5,
       //   f_y: 0.8,
       //   size: 3,
-      //   position: [0, 0, 0],
+      //   position: [0, 1.4, 0],
       // },
     },
   },
@@ -55,7 +55,7 @@ export default function Scene() {
           data.source,
           geomRef.current,
           data.scene.geometry,
-          100
+          75
         );
         if (mounted) setRays(generated);
       } else {
@@ -70,13 +70,13 @@ export default function Scene() {
 
   return (
     <Canvas
-      style={{ background: "linear-gradient(to bottom, #5e5977ff, #1b1b30ff)" }}
-      camera={{ position: [8, 2, 12], fov: 50 }}
+      style={{ background: "linear-gradient(to bottom, #766e9bff, #141430ff)" }}
+      camera={{ position: [8, 2, 12], fov: 40 }}
     >
       <ambientLight intensity={0.3} />
       <directionalLight position={[0, 2000, -150000000]} intensity={1} />
       <OrbitControls />
-      <CustomAxes size={10} divisions={50} />
+      <CustomAxes size={10} divisions={30} />
 
       <Geometry ref={geomRef} geom={data.scene.geometry} />
       <Source src={data.source} />
