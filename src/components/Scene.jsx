@@ -25,12 +25,16 @@ const data = {
     },
   },
   source: {
-    type: "Large",
+    // type: "Large",
+    // params: {
+    //   position: [0, 2, -150000000],
+    //   width: 1,
+    //   height: 1,
+    //   intensity: 1,
+    // },
+    type: "Point",
     params: {
-      position: [0, 2, -20],
-      width: 0.1,
-      height: 0.1,
-      color: "#FFFFFF",
+      position: [0, 2, -150000000],
       intensity: 1,
     },
   },
@@ -43,12 +47,10 @@ export default function Scene() {
   useEffect(() => {
     let mounted = true
     const tryGenerate = () => {
-      // si mesh disponible -> génère
       if (geomRef.current) {
-        const generated = generateRays(data.source, geomRef.current, data.scene.geometry, 10)
+        const generated = generateRays(data.source, geomRef.current, data.scene.geometry, 100)
         if (mounted) setRays(generated)
       } else {
-        // sinon on réessaie dans un court délai
         setTimeout(tryGenerate, 50)
       }
     }
@@ -59,9 +61,9 @@ export default function Scene() {
   }, [])
 
   return (
-    <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
+    <Canvas camera={{ position: [8, 2, 12], fov: 50 }}>
       <ambientLight intensity={0.3} />
-      <directionalLight position={[5, 10, 5]} intensity={1} />
+      <directionalLight position={[0, 2, -150000000]} intensity={1} />
       <OrbitControls />
       <axesHelper args={[5]} />
 
