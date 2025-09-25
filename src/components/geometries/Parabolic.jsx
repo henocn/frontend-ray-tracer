@@ -22,6 +22,7 @@ const Parabolic = ({ params }) => {
     const y = (v - 0.5) * size
     const z = (x * x) / (4 * f_x) + (y * y) / (4 * f_y)
     target.set(x, y, z)
+    // console.log(target)
   }
 
   return (

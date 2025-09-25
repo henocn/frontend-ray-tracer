@@ -4,13 +4,9 @@ import LargeSource from "./sources/LargeSource";
 const Source = ({ src }) => {
   switch (src.type) {
     case "Point":
-      const component = <PointSource params={src.params} />;
-      console.log(component);
-      return component;
+      return <PointSource params={src.params} />;
     case "Large":
-      const largeComponent = <LargeSource params={src.params} />;
-      console.log(largeComponent);
-      return largeComponent;
+      return <LargeSource params={src.params} />;
     default:
       return null;
   }
