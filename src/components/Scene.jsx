@@ -8,12 +8,19 @@ import Ray from "./Ray";
 const data = {
   scene: {
     geometry: {
-      type: "Cylindric",
+      // type: "Cylindric",
+      // params: {
+      //   radius: 1,
+      //   height: 3,
+      //   position: [0, 0, 0],
+      //   rotation: [0, 0, 0],
+      // },
+      type: "Parabolic",
       params: {
-        radius: 1,
-        height: 3,
+        focalLength: 2,
+        height: 4,
         position: [0, 0, 0],
-        rotation: [0, 0, 0],
+        rotation: [-Math.PI / 2, 0, 0],
       },
     },
   },
@@ -61,7 +68,12 @@ export default function Scene() {
     <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
       <ambientLight intensity={0.3} />
       <directionalLight position={[5, 10, 5]} intensity={1} />
+
       <OrbitControls />
+
+      {/* Repère 3D */}
+      <axesHelper args={[5]} />
+
       {/* Géométries */}
       <Geometry geom={data.scene.geometry} />
       <Source src={data.source} />

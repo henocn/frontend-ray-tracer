@@ -10,6 +10,8 @@ const Cylindric = ({ params }) => {
         color="#4A90E2"
         metalness={0.3}
         roughness={0.6}
+        opacity={0.7}
+        transparent={true}
       />
       <Edges color="darkblue" />
     </mesh>
