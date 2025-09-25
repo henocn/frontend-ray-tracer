@@ -4,6 +4,7 @@ import { OrbitControls } from "@react-three/drei";
 import Geometry from "./Geometry";
 import Source from "./Source";
 import Ray from "./Ray";
+import { generateRays } from "../utils/generateRays";
 
 const data = {
   scene: {
@@ -39,28 +40,10 @@ const data = {
       color: "#FFFFFF",
       intensity: 1,
     },
-  },
-  rays: [
-    {
-      id: "ray1",
-      points: [
-        [0, 2, -5],
-        [0, 1, -2],
-        [1, 0, 1],
-        [2, -1, 3],
-      ],
-    },
-    {
-      id: "ray2",
-      points: [
-        [-3, 0, -5],
-        [-2, 0, -2],
-        [0, 0, 0],
-        [2, 1, 2],
-      ],
-    },
-  ],
+  }
 };
+const rays = generateRays(data.source, data.scene.geometry, 50);
+data.rays = rays;
 
 // Scène principale
 export default function Scene() {

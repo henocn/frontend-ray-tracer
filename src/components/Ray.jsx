@@ -1,18 +1,17 @@
-import { useMemo } from "react";
-import * as THREE from "three";
-    
+import { useMemo } from "react"
+import * as THREE from "three"
 
 const Ray = ({ ray }) => {
-  const points = useMemo(
-    () => ray.points.map((p) => new THREE.Vector3(...p)),
-    [ray]
-  );
-  return (
-    <line>
-      <bufferGeometry attach="geometry" setFromPoints={points} />
-      <lineBasicMaterial color={ray.color || "red"} />
-    </line>
-  );
-};
+  const geometry = useMemo(() => {
+    const points = ray.points.map((p) => new THREE.Vector3(...p))
+    return new THREE.BufferGeometry().setFromPoints(points)
+  }, [ray])
 
-export default Ray;
+  return (
+    <line geometry={geometry}>
+      <lineBasicMaterial color={ray.color || "white"} />
+    </line>
+  )
+}
+
+export default Ray
