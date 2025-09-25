@@ -10,8 +10,8 @@ const Cylindric = forwardRef(({ params }, ref) => {
     radius = 1,
     height = 2,
     radialSegments = 64,
-    color = "#4A90E2",
-    opacity = 1,
+    color = "#E67E22",
+    opacity = 0.8,
   } = params
 
   return (
@@ -21,7 +21,7 @@ const Cylindric = forwardRef(({ params }, ref) => {
         color={color}
         metalness={0.3}
         roughness={0.6}
-        transparent={opacity < 1}
+        transparent={true}
         opacity={opacity}
         side={THREE.DoubleSide}
       />

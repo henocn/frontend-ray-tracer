@@ -11,7 +11,7 @@ const data = {
     geometry: {
       type: "Cylindric",
       params: {
-        size: 12,
+        size: 4,
         height: 2,
         position: [0, 0, 0],
       },
