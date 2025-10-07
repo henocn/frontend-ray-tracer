@@ -61,12 +61,11 @@ export default function Scene() {
           geomRefs.current,
           data.scene.geometries,
           200,
-          5000,
-          false
+          5000
         );
         if (mounted) setRays(generated);
       } else {
-        setTimeout(tryGenerate, 50); // réessayer dans 50ms
+        setTimeout(tryGenerate, 50);
       }
     };
 

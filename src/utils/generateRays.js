@@ -1,4 +1,4 @@
-// src/utils/generateRays.js
+
 import * as THREE from "three"
 import { getGeometryBoundaries } from "./boundaries.js"
 
@@ -63,7 +63,7 @@ function samplePointOnSurface(geom) {
  * @param {number} maxAttempts - max tries
  * @param {boolean} debug - console.debug logs
  */
-export function generateRays(source, meshes, geometries, n = 10, maxAttempts = 2000, debug = false) {
+export function generateRays(source, meshes, geometries, n = 10, maxAttempts = 2000) {
   if (!meshes?.length) {
     if (debug) console.warn("[generateRays] No meshes provided")
     return []
@@ -95,10 +95,6 @@ export function generateRays(source, meshes, geometries, n = 10, maxAttempts = 2
 
     // check intersection with the mesh
     const intersects = mesh ? raycaster.intersectObject(mesh, true) : []
-
-    if (debug) {
-      console.debug(`[generateRays] attempt ${attempts}, target=${sampled}, hits=${intersects.length}`)
-    }
 
     if (intersects.length > 0) {
       const hit = intersects[0].point.toArray()
