@@ -19,22 +19,31 @@ const data = {
           position: [0, 1.4, 0],
         },
       },
-      {
-        type: "Cylindric",
-        params: {
-          size: 2,
-          height: 1.5,
-          position: [4, 11, 2],
-        },
-      },
-      {
-        type: "Cylindric",
-        params: {
-          size: 1.2,
-          height: 1.8,
-          position: [-3, 1, -1],
-        },
-      },
+      // {
+      //   type: "Parabolic",
+      //   params: {
+      //     f_x: 0.5,
+      //     f_y: 0.6,
+      //     size: 2.7,
+      //     position: [2, 5, -2],
+      //   },
+      // },
+      // {
+      //   type: "Cylindric",
+      //   params: {
+      //     size: 2,
+      //     height: 1.5,
+      //     position: [4, 1 , 2],
+      //   },
+      // },
+      // {
+      //   type: "Cylindric",
+      //   params: {
+      //     size: 1.2,
+      //     height: 1.8,
+      //     position: [-3, 1, -1],
+      //   },
+      // },
     ],
   },
   source: {
@@ -60,7 +69,7 @@ export default function Scene() {
           data.source,
           geomRefs.current,
           data.scene.geometries,
-          2000,
+          1000,
           5000
         );
         if (mounted) setRays(generated);
