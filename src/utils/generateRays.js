@@ -1,4 +1,3 @@
-
 import * as THREE from "three"
 import { getGeometryBoundaries } from "./boundaries.js"
 
@@ -9,44 +8,31 @@ function samplePointOnSurface(geom) {
   const type = geom.type
   const p = geom.params || {}
 
+  // récupérer les bornes
+  const b = getGeometryBoundaries(type, p)
+
   if (type === "Parabolic") {
-    const f_x = p.f_x || 0.5
-    const f_y = p.f_y || 0.5
-    const size = p.size || 3
-    const [px, py, pz] = p.position || [0, 0, 0]
-
-    const x_local = (Math.random() - 0.5) * size
-    const y_local = (Math.random() - 0.5) * size
-    const z_local = (x_local * x_local) / (4 * f_x) + (y_local * y_local) / (4 * f_y)
-
-    return [px + x_local, py + y_local, pz + z_local]
+    const x_local = Math.random() * (b.xmax - b.xmin) + b.xmin
+    const y_local = Math.random() * (b.ymax - b.ymin) + b.ymin
+    const z_local = (x_local * x_local) / (4 * (p.f_x || 0.5)) + (y_local * y_local) / (4 * (p.f_y || 0.5))
+    return [x_local, y_local, b.zmin + z_local]
   }
 
   if (type === "Cylindric") {
-    const radius = p.radius ?? p.size / 2 ?? 1
-    const height = p.height ?? 1
-    const [px, py, pz] = p.position || [0, 0, 0]
-
-    const angle = Math.random() * Math.PI * 2
-    const x = px + radius * Math.cos(angle)
-    const y = py + radius * Math.sin(angle)
-    const z = pz + (Math.random() - 0.5) * height
-
-    return [x, y, z]
+    const x_local = Math.random() * (b.xmax - b.xmin) + b.xmin
+    const y_local = Math.random() * (b.ymax - b.ymin) + b.ymin
+    const z_local = Math.random() * (b.zmax - b.zmin) + b.zmin
+    return [x_local, y_local, z_local]
   }
 
   if (type === "RingArray") {
-    const radius = p.radius || 3
-    const count = p.count || p.elementsCount || 8
+    const angle = Math.random() * 2 * Math.PI
+    const r = p.radius || 3
     const [px, py, pz] = p.position || [0, 0, 0]
-
-    const idx = Math.floor(Math.random() * count)
-    const angle = (idx / count) * Math.PI * 2
-    return [px + radius * Math.cos(angle), py + radius * Math.sin(angle), pz]
+    return [px + r * Math.cos(angle), py + r * Math.sin(angle), pz]
   }
 
-  // fallback: uniform random in bounding box
-  const b = getGeometryBoundaries(type, p)
+  // fallback
   return [
     Math.random() * (b.xmax - b.xmin) + b.xmin,
     Math.random() * (b.ymax - b.ymin) + b.ymin,
@@ -54,58 +40,46 @@ function samplePointOnSurface(geom) {
   ]
 }
 
+
 /**
- * Generate rays that hit your meshes.
- * @param {Object} source - { params: { position: [x,y,z] } }
- * @param {Array<THREE.Object3D>} meshes - refs from R3F
- * @param {Array<Object>} geometries - {type, params} array
- * @param {number} n - desired number of rays
- * @param {number} maxAttempts - max tries
- * @param {boolean} debug - console.debug logs
+ * Generate rays roughly equally distributed among geometries
  */
 export function generateRays(source, meshes, geometries, n = 10, maxAttempts = 2000) {
-  if (!meshes?.length) {
-    if (debug) console.warn("[generateRays] No meshes provided")
-    return []
-  }
+  if (!meshes?.length || !geometries?.length) return []
 
-  const raycaster = new THREE.Raycaster()
   const rays = []
-  let attempts = 0
-
+  const raycaster = new THREE.Raycaster()
   const origin = new THREE.Vector3(...(source?.params?.position || [0, 0, 0]))
 
-  // mesh + geometry pairs
+  // mesh+geometry pairs
   const pairs = geometries.map((g, i) => ({ geom: g, mesh: meshes[i] })).filter(x => x.mesh)
-  if (pairs.length === 0) {
-    if (debug) console.warn("[generateRays] No valid mesh/geometry pairs")
-    return []
-  }
+  if (!pairs.length) return []
 
-  while (rays.length < n && attempts < maxAttempts) {
-    attempts++
-    const pair = pairs[Math.floor(Math.random() * pairs.length)]
-    const { geom, mesh } = pair
-    if (!mesh) continue
+  // répartir n rayons équitablement
+  const nPerGeom = Math.ceil(n / pairs.length)
 
-    const sampled = samplePointOnSurface(geom)
-    const target = new THREE.Vector3(...sampled)
-    const dir = new THREE.Vector3().subVectors(target, origin).normalize()
-    raycaster.set(origin, dir)
+  pairs.forEach(({ geom, mesh }, idx) => {
+    let attempts = 0
+    let generated = 0
 
-    // check intersection with the mesh
-    const intersects = mesh ? raycaster.intersectObject(mesh, true) : []
+    while (generated < nPerGeom && attempts < maxAttempts) {
+      attempts++
+      const sampled = samplePointOnSurface(geom)
+      const target = new THREE.Vector3(...sampled)
+      const dir = new THREE.Vector3().subVectors(target, origin).normalize()
+      raycaster.set(origin, dir)
 
-    if (intersects.length > 0) {
-      const hit = intersects[0].point.toArray()
-      rays.push({
-        id: `ray${rays.length + 1}`,
-        color: "#FFFFFF",
-        points: [origin.toArray(), hit],
-      })
+      const intersects = mesh ? raycaster.intersectObject(mesh, true) : []
+      if (intersects.length > 0) {
+        const hit = intersects[0].point.toArray()
+        rays.push({
+          id: `ray${rays.length + 1}`,
+          points: [origin.toArray(), hit],
+        })
+        generated++
+      }
     }
-  }
+  })
 
-  if (debug) console.debug(`[generateRays] finished: attempts=${attempts}, rays=${rays.length}/${n}`)
   return rays
 }

@@ -24,7 +24,7 @@ const data = {
         params: {
           size: 2,
           height: 1.5,
-          position: [4, 1, 2],
+          position: [4, 11, 2],
         },
       },
       {
@@ -60,7 +60,7 @@ export default function Scene() {
           data.source,
           geomRefs.current,
           data.scene.geometries,
-          200,
+          2000,
           5000
         );
         if (mounted) setRays(generated);
@@ -96,8 +96,6 @@ export default function Scene() {
       ))}
 
       <Source src={data.source} />
-
-      {console.log(rays)}
 
       {rays.map((r) => (
         <Ray key={r.id} ray={r} />

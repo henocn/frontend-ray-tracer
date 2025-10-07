@@ -9,7 +9,7 @@ const Ray = ({ ray }) => {
 
   return (
     <line geometry={geometry}>
-      <lineBasicMaterial color={ray.color || "red"} transparent opacity={0.7} />
+      <lineBasicMaterial color={ray.color || "white"} transparent opacity={0.7} />
     </line>
   );
 };
