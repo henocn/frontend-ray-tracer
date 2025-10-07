@@ -54,17 +54,19 @@ export default function Scene() {
     let mounted = true;
 
     const tryGenerate = () => {
-      const allReady = geomRefs.current.every((g) => g);
-      if (allReady) {
+      const readyCount = geomRefs.current.filter(Boolean).length;
+      if (readyCount === data.scene.geometries.length) {
         const generated = generateRays(
           data.source,
           geomRefs.current,
           data.scene.geometries,
-          1000 // nombre de rayons
+          200,
+          5000,
+          false
         );
         if (mounted) setRays(generated);
       } else {
-        setTimeout(tryGenerate, 50);
+        setTimeout(tryGenerate, 50); // réessayer dans 50ms
       }
     };
 
@@ -95,6 +97,8 @@ export default function Scene() {
       ))}
 
       <Source src={data.source} />
+
+      {console.log(rays)}
 
       {rays.map((r) => (
         <Ray key={r.id} ray={r} />

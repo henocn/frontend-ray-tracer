@@ -1,70 +1,115 @@
-import * as THREE from "three";
-import { getGeometryBoundaries } from "./boundaries.js";
+// src/utils/generateRays.js
+import * as THREE from "three"
+import { getGeometryBoundaries } from "./boundaries.js"
 
 /**
- * Génère des rayons à partir d'une source vers un ensemble de géométries.
- * @param {Object} source - Définition de la source (position, type, etc.)
- * @param {Array<THREE.Mesh>} meshes - Tableau des maillages à viser.
- * @param {Array<Object>} geometries - Tableau des définitions de géométrie (type, params).
- * @param {number} n - Nombre de rayons à générer.
- * @param {number} maxAttempts - Tentatives maximales avant d'abandonner.
+ * Sample a random point on the surface of a geometry (world coords)
  */
-export function generateRays(source, meshes, geometries, n = 10, maxAttempts = 2000) {
-  if (!meshes || meshes.length === 0) return [];
+function samplePointOnSurface(geom) {
+  const type = geom.type
+  const p = geom.params || {}
 
-  // On calcule les bornes combinées de toutes les géométries
-  const combinedBounds = geometries.reduce(
-    (acc, geom) => {
-      const b = getGeometryBoundaries(geom.type, geom.params);
-      acc.xmin = Math.min(acc.xmin, b.xmin);
-      acc.xmax = Math.max(acc.xmax, b.xmax);
-      acc.ymin = Math.min(acc.ymin, b.ymin);
-      acc.ymax = Math.max(acc.ymax, b.ymax);
-      acc.zmin = Math.min(acc.zmin, b.zmin);
-      acc.zmax = Math.max(acc.zmax, b.zmax);
-      return acc;
-    },
-    {
-      xmin: Infinity,
-      xmax: -Infinity,
-      ymin: Infinity,
-      ymax: -Infinity,
-      zmin: Infinity,
-      zmax: -Infinity,
-    }
-  );
+  if (type === "Parabolic") {
+    const f_x = p.f_x || 0.5
+    const f_y = p.f_y || 0.5
+    const size = p.size || 3
+    const [px, py, pz] = p.position || [0, 0, 0]
 
-  const raycaster = new THREE.Raycaster();
-  const rays = [];
-  let attempts = 0;
+    const x_local = (Math.random() - 0.5) * size
+    const y_local = (Math.random() - 0.5) * size
+    const z_local = (x_local * x_local) / (4 * f_x) + (y_local * y_local) / (4 * f_y)
+
+    return [px + x_local, py + y_local, pz + z_local]
+  }
+
+  if (type === "Cylindric") {
+    const radius = p.radius ?? p.size / 2 ?? 1
+    const height = p.height ?? 1
+    const [px, py, pz] = p.position || [0, 0, 0]
+
+    const angle = Math.random() * Math.PI * 2
+    const x = px + radius * Math.cos(angle)
+    const y = py + radius * Math.sin(angle)
+    const z = pz + (Math.random() - 0.5) * height
+
+    return [x, y, z]
+  }
+
+  if (type === "RingArray") {
+    const radius = p.radius || 3
+    const count = p.count || p.elementsCount || 8
+    const [px, py, pz] = p.position || [0, 0, 0]
+
+    const idx = Math.floor(Math.random() * count)
+    const angle = (idx / count) * Math.PI * 2
+    return [px + radius * Math.cos(angle), py + radius * Math.sin(angle), pz]
+  }
+
+  // fallback: uniform random in bounding box
+  const b = getGeometryBoundaries(type, p)
+  return [
+    Math.random() * (b.xmax - b.xmin) + b.xmin,
+    Math.random() * (b.ymax - b.ymin) + b.ymin,
+    Math.random() * (b.zmax - b.zmin) + b.zmin,
+  ]
+}
+
+/**
+ * Generate rays that hit your meshes.
+ * @param {Object} source - { params: { position: [x,y,z] } }
+ * @param {Array<THREE.Object3D>} meshes - refs from R3F
+ * @param {Array<Object>} geometries - {type, params} array
+ * @param {number} n - desired number of rays
+ * @param {number} maxAttempts - max tries
+ * @param {boolean} debug - console.debug logs
+ */
+export function generateRays(source, meshes, geometries, n = 10, maxAttempts = 2000, debug = false) {
+  if (!meshes?.length) {
+    if (debug) console.warn("[generateRays] No meshes provided")
+    return []
+  }
+
+  const raycaster = new THREE.Raycaster()
+  const rays = []
+  let attempts = 0
+
+  const origin = new THREE.Vector3(...(source?.params?.position || [0, 0, 0]))
+
+  // mesh + geometry pairs
+  const pairs = geometries.map((g, i) => ({ geom: g, mesh: meshes[i] })).filter(x => x.mesh)
+  if (pairs.length === 0) {
+    if (debug) console.warn("[generateRays] No valid mesh/geometry pairs")
+    return []
+  }
 
   while (rays.length < n && attempts < maxAttempts) {
-    attempts++;
+    attempts++
+    const pair = pairs[Math.floor(Math.random() * pairs.length)]
+    const { geom, mesh } = pair
+    if (!mesh) continue
 
-    // Génère une cible aléatoire dans la zone englobante de toutes les géométries
-    const randTarget = [
-      Math.random() * (combinedBounds.xmax - combinedBounds.xmin) + combinedBounds.xmin,
-      Math.random() * (combinedBounds.ymax - combinedBounds.ymin) + combinedBounds.ymin,
-      Math.random() * (combinedBounds.zmax - combinedBounds.zmin) + combinedBounds.zmin,
-    ];
+    const sampled = samplePointOnSurface(geom)
+    const target = new THREE.Vector3(...sampled)
+    const dir = new THREE.Vector3().subVectors(target, origin).normalize()
+    raycaster.set(origin, dir)
 
-    const origin = new THREE.Vector3(...(source.params.position || [0, 0, 0]));
-    const dir = new THREE.Vector3(...randTarget).sub(origin).normalize();
-    raycaster.set(origin, dir);
+    // check intersection with the mesh
+    const intersects = mesh ? raycaster.intersectObject(mesh, true) : []
 
-    // Vérifie l’intersection avec n’importe quelle géométrie
-    const intersects = raycaster.intersectObjects(meshes, true);
+    if (debug) {
+      console.debug(`[generateRays] attempt ${attempts}, target=${sampled}, hits=${intersects.length}`)
+    }
 
     if (intersects.length > 0) {
-      // On prend le point d’intersection le plus proche
-      const hit = intersects[0].point.toArray();
+      const hit = intersects[0].point.toArray()
       rays.push({
         id: `ray${rays.length + 1}`,
-        color: "white",
+        color: "#FFFFFF",
         points: [origin.toArray(), hit],
-      });
+      })
     }
   }
 
-  return rays;
+  if (debug) console.debug(`[generateRays] finished: attempts=${attempts}, rays=${rays.length}/${n}`)
+  return rays
 }
