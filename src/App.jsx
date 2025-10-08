@@ -20,12 +20,8 @@ function App() {
         onChangeLang={handleChangeLang}
       />
 
-      {/* --- Contenu principal (Sidebar + Scene) --- */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar fixe à gauche */}
         <Sidebar darkMode={darkMode} />
-
-        {/* Scène 3D qui prend tout l’espace restant */}
         <div className="flex-1 h-full">
           <Scene />
         </div>
