@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Geometry from "./Geometry";
 import Source from "./Source";
-import Ray from "./Ray";
+import Rays from "./Rays";
 import { generateRays } from "../utils/generateRays";
 import CustomAxes from "../utils/Axes";
 
@@ -19,15 +19,15 @@ const data = {
           position: [0, 1.4, 0],
         },
       },
-      // {
-      //   type: "Parabolic",
-      //   params: {
-      //     f_x: 0.5,
-      //     f_y: 0.6,
-      //     size: 2.7,
-      //     position: [2, 5, -2],
-      //   },
-      // },
+      {
+        type: "Parabolic",
+        params: {
+          f_x: 0.5,
+          f_y: 0.6,
+          size: 2.7,
+          position: [2, 5, -2],
+        },
+      },
       // {
       //   type: "Cylindric",
       //   params: {
@@ -69,7 +69,7 @@ export default function Scene() {
           data.source,
           geomRefs.current,
           data.scene.geometries,
-          1000,
+          10000000,
           5000
         );
         if (mounted) setRays(generated);
@@ -106,9 +106,7 @@ export default function Scene() {
 
       <Source src={data.source} />
 
-      {rays.map((r) => (
-        <Ray key={r.id} ray={r} />
-      ))}
+      <Rays rays={rays} />
     </Canvas>
   );
 }
