@@ -7,12 +7,10 @@ const Topbar = ({ darkMode, onToggleTheme, onChangeLang }) => {
       className={`flex items-center justify-between px-6 py-3 shadow-md border-b transition-all duration-300 
       ${darkMode ? "bg-slate-900 border-slate-700 text-slate-100" : "bg-slate-100 border-slate-300 text-slate-900"}`}
     >
-      {/* --- Logo / titre --- */}
       <h1 className="text-xl font-semibold tracking-wide text-orange-500">
         OpticalRayTracer
       </h1>
 
-      {/* --- Boutons centraux --- */}
       <div className="flex gap-4">
         <button
           className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200
