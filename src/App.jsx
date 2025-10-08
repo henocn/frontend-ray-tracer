@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import Scene from "./components/Scene"
 import Topbar from "./components/Topbar"
 import Sidebar from "./components/Sidebar"
+import Test from "./components/Test"
 
 function App() {
   const [darkMode, setDarkMode] = useState(true)
@@ -23,7 +24,8 @@ function App() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar darkMode={darkMode} />
         <div className="flex-1 h-full">
-          <Scene />
+          {/* <Scene /> */}
+          <Test />
         </div>
       </div>
     </div>
