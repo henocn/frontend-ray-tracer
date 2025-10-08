@@ -11,7 +11,7 @@ const Cylindric = forwardRef(({ params }, ref) => {
     height = 2,
     radialSegments = 64,
     color = "#E67E22",
-    opacity = 0.9,
+    opacity = 1,
   } = params
 
   return (

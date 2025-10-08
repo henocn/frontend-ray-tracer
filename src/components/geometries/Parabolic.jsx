@@ -16,7 +16,7 @@ const Parabolic = forwardRef(({ params }, ref) => {
     segments = 32,
     position = [0, 0, 0],
     color = "#E67E22",
-    opacity = 0.9,
+    opacity = 1,
   } = params
 
   const parabola = (u, v, target) => {
