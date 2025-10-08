@@ -14,7 +14,6 @@ function App() {
       className={`flex flex-col w-screen h-screen overflow-hidden 
       ${darkMode ? "bg-slate-950 text-slate-100" : "bg-white text-slate-900"}`}
     >
-      {/* --- Barre du haut --- */}
       <Topbar
         darkMode={darkMode}
         onToggleTheme={handleToggleTheme}
