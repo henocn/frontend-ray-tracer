@@ -9,6 +9,7 @@ function App() {
 
   const handleToggleTheme = () => setDarkMode(!darkMode)
   const handleChangeLang = () => alert("Langue changée !")
+  const [sceneConfig, setSceneConfig] = useState({scene: {geometries: []}, source: {}});
 
   return (
     <div
@@ -22,14 +23,16 @@ function App() {
       />
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar darkMode={darkMode} />
+        {/* Passe un callback à Sidebar pour mettre à jour l'état */}
+        <Sidebar darkMode={darkMode} onApplyConfig={setSceneConfig} />
+
         <div className="flex-1 h-full">
-          <Scene />
-          {/* <Test /> */}
+          {/* Passe le JSON comme prop à Scene */}
+          <Scene sceneData={sceneConfig} />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default App

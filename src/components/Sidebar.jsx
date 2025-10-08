@@ -12,7 +12,7 @@ const geometryDefinitions = {
 const Sidebar = ({ darkMode, onApplyConfig }) => {
   // Source
   const [sourceType, setSourceType] = useState("Pointue");
-  const [sourcePos, setSourcePos] = useState("0,3,0");
+  const [sourcePos, setSourcePos] = useState("0,3,-150000000");
   const [sourceSize, setSourceSize] = useState({ width: 1, height: 1 });
 
   // Géométrie
@@ -24,7 +24,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   const [geometries, setGeometries] = useState([]);
 
   // Rayons
-  const [rayCount, setRayCount] = useState(5000);
+  const [rayCount, setRayCount] = useState(500);
 
   // Changement type géométrie
   const handleGeometryTypeChange = (e) => {

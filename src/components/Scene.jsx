@@ -7,68 +7,21 @@ import Rays from "./Rays";
 import { generateRays } from "../utils/generateRays";
 import CustomAxes from "../utils/Axes";
 
-const data = {
-  scene: {
-    geometries: [
-      {
-        type: "Parabolic",
-        params: {
-          f_x: 0.5,
-          f_y: 0.8,
-          size: 3,
-          position: [0, 1.4, 0],
-        },
-      },
-      {
-        type: "Parabolic",
-        params: {
-          f_x: 0.5,
-          f_y: 0.6,
-          size: 2.7,
-          position: [2, 5, -2],
-        },
-      },
-      // {
-      //   type: "Cylindric",
-      //   params: {
-      //     size: 2,
-      //     height: 1.5,
-      //     position: [4, 1 , 2],
-      //   },
-      // },
-      // {
-      //   type: "Cylindric",
-      //   params: {
-      //     size: 1.2,
-      //     height: 1.8,
-      //     position: [-3, 1, -1],
-      //   },
-      // },
-    ],
-  },
-  source: {
-    type: "Point",
-    params: {
-      position: [0, 3, -150000000],
-      intensity: 1,
-    },
-  },
-};
-
-export default function Scene() {
+export default function Scene({ sceneData }) {
   const geomRefs = useRef([]);
   const [rays, setRays] = useState([]);
 
   useEffect(() => {
+    if (!sceneData) return;
     let mounted = true;
 
     const tryGenerate = () => {
       const readyCount = geomRefs.current.filter(Boolean).length;
-      if (readyCount === data.scene.geometries.length) {
+      if (readyCount === sceneData.scene.geometries.length) {
         const generated = generateRays(
-          data.source,
+          sceneData.source,
           geomRefs.current,
-          data.scene.geometries,
+          sceneData.scene.geometries,
           300,
           5000
         );
@@ -82,7 +35,7 @@ export default function Scene() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [sceneData]);
 
   return (
     <Canvas
@@ -96,7 +49,7 @@ export default function Scene() {
       <OrbitControls />
       <CustomAxes size={10} divisions={30} />
 
-      {data.scene.geometries.map((geom, i) => (
+      {sceneData.scene.geometries.map((geom, i) => (
         <Geometry
           key={i}
           ref={(el) => (geomRefs.current[i] = el)}
@@ -104,9 +57,9 @@ export default function Scene() {
         />
       ))}
 
-      <Source src={data.source} />
+      <Source src={sceneData.source} />
 
-      <Rays rays ={rays} />
+      <Rays rays={rays} />
     </Canvas>
   );
 }
