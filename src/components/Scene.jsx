@@ -106,7 +106,7 @@ export default function Scene() {
 
       <Source src={data.source} />
 
-      <Rays rays={rays} />
+      <Rays rays ={rays} />
     </Canvas>
   );
 }

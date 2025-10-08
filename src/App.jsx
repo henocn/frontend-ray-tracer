@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import Scene from "./components/scene"
+import Scene from "./components/Scene"
 import Topbar from "./components/Topbar"
 import Sidebar from "./components/Sidebar"
 
