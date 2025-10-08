@@ -24,8 +24,8 @@ function App() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar darkMode={darkMode} />
         <div className="flex-1 h-full">
-          {/* <Scene /> */}
-          <Test />
+          <Scene />
+          {/* <Test /> */}
         </div>
       </div>
     </div>
