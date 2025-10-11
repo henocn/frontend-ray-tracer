@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Trash2 } from "lucide-react";
+import GeometryList from "../sidebar/GeometryList";
 
 // Définitions des géométries et leurs paramètres par défaut
 const geometryDefinitions = {
   Parabolic: { f_x: 0.5, f_y: 0.8, size: 3, position: "0,1.4,0" },
   Cylindric: { size: 2, height: 1.5, position: "0,0,0" },
   RingArray: { innerRadius: 1, outerRadius: 2, count: 8, position: "0,0,0" },
-  Quelconque: { equation: "z = x*x + y*y" },
+  Quelconque: { equation: "x*x + y*y" },
 };
 
 const Sidebar = ({ darkMode, onApplyConfig }) => {
@@ -20,7 +20,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   const [geometryParams, setGeometryParams] = useState(
     geometryDefinitions["Parabolic"]
   );
-  const [geometryEquation, setGeometryEquation] = useState("z = x*x + y*y");
+  const [geometryEquation, setGeometryEquation] = useState("x*x + y*y");
   const [geometries, setGeometries] = useState([]);
 
   // ---- RAYONS ----
@@ -29,8 +29,8 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   // ---- ANALYSE ----
   const [analysisType, setAnalysisType] = useState("Plan");
   const [planType, setPlanType] = useState("XY");
-  const [planPosition, setPlanPosition] = useState("0,0,0");
-  const [analysisEquation, setAnalysisEquation] = useState("z = x*x + y*y");
+  const [planPosition, setPlanPosition] = useState("0,0");
+  const [analysisEquation, setAnalysisEquation] = useState("x*x + y*y");
 
   // ---- MODE (Séquentiel / Parallèle) ----
   const [mode, setMode] = useState(1); // 1 = Séquentiel, 0 = Parallèle
@@ -40,7 +40,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
     const newType = e.target.value;
     setGeometryType(newType);
     setGeometryParams(geometryDefinitions[newType] || {});
-    if (newType === "Quelconque") setGeometryEquation("z = x*x + y*y");
+    if (newType === "Quelconque") setGeometryEquation("x*x + y*y");
   };
 
   // Changement paramètre géométrie
@@ -104,7 +104,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
       mode, // 1 = séquentiel, 0 = parallèle
     };
 
-    console.log("🧩 Données JSON construites :", data);
+    console.log("Débug : ", data);
     if (onApplyConfig) onApplyConfig(data);
   };
 
@@ -116,9 +116,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   }`;
   const labelClass = "text-sm font-medium mb-1";
   const inputClass = `px-2 py-1 rounded border text-sm w-full ${
-    darkMode
-      ? "bg-slate-700 border-slate-600"
-      : "bg-white border-slate-300"
+    darkMode ? "bg-slate-700 border-slate-600" : "bg-white border-slate-300"
   }`;
 
   return (
@@ -161,7 +159,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
               <option value="XZ">XZ</option>
             </select>
 
-            <label className={labelClass}>Position (x, y, z)</label>
+            <label className={labelClass}>Position (n, m)</label>
             <input
               type="text"
               value={planPosition}
@@ -231,7 +229,10 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
                 type="number"
                 value={sourceSize.width}
                 onChange={(e) =>
-                  setSourceSize({ ...sourceSize, width: Number(e.target.value) })
+                  setSourceSize({
+                    ...sourceSize,
+                    width: Number(e.target.value),
+                  })
                 }
                 className={inputClass}
               />
@@ -256,7 +257,9 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
 
       {/* ---- GÉOMÉTRIE ---- */}
       <div className={sectionClass}>
-        <h3 className="text-md font-semibold text-orange-500 mb-2">Géométrie</h3>
+        <h3 className="text-md font-semibold text-orange-500 mb-2">
+          Géométrie
+        </h3>
         <label className={labelClass}>Type</label>
         <select
           value={geometryType}
@@ -309,32 +312,11 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
           Ajouter la géométrie
         </button>
 
-        {geometries.length > 0 && (
-          <div className="mt-3">
-            <h4 className="text-sm font-semibold mb-2 text-orange-400">
-              Géométries ajoutées
-            </h4>
-            <ul className="space-y-1">
-              {geometries.map((geo) => (
-                <li
-                  key={geo.id}
-                  className={`flex items-center justify-between text-sm p-1 rounded ${
-                    darkMode ? "bg-slate-700" : "bg-slate-200"
-                  }`}
-                >
-                  <span>
-                    {geo.type} #{geo.id}
-                  </span>
-                  <Trash2
-                    size={16}
-                    className="cursor-pointer text-red-400 hover:text-red-500"
-                    onClick={() => handleRemoveGeometry(geo.id)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <GeometryList
+          darkMode={darkMode}
+          geometries={geometries}
+          onRemoveGeometry={handleRemoveGeometry}
+        />
       </div>
 
       {/* ---- RAYONS ---- */}
