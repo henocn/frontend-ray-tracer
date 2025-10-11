@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import GeometryList from "../sidebar/GeometryList";
+import GeometrySelection from "../sidebar/GeometrySelection";
+import SourceSelection from "../sidebar/SourceSelection";
+import ExecutionMode from "../sidebar/ExecutionMode";
+import AnalysisType from "../sidebar/AnalysisType";
+import RaysInput from "../sidebar/RaysInput";
 
 // Définitions des géométries et leurs paramètres par défaut
 const geometryDefinitions = {
@@ -133,203 +137,67 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
       </h2>
 
       {/* ---- TYPE D’ANALYSE ---- */}
-      <div className={sectionClass}>
-        <h3 className="text-md font-semibold text-orange-500 mb-2">
-          Type d’analyse
-        </h3>
-        <select
-          value={analysisType}
-          onChange={(e) => setAnalysisType(e.target.value)}
-          className={inputClass}
-        >
-          <option value="Plan">Plan</option>
-          <option value="Géométrie quelconque">Géométrie quelconque</option>
-        </select>
+      <AnalysisType
+        sectionClass={sectionClass}
+        analysisType={analysisType}
+        setAnalysisType={setAnalysisType}
+        planType={planType}
+        setPlanType={setPlanType}
+        planPosition={planPosition}
+        setPlanPosition={setPlanPosition}
+        analysisEquation={analysisEquation}
+        setAnalysisEquation={setAnalysisEquation}
+        labelClass={labelClass}
+        inputClass={inputClass}
+      />
 
-        {analysisType === "Plan" ? (
-          <div className="mt-3 flex flex-col gap-2">
-            <label className={labelClass}>Plan</label>
-            <select
-              value={planType}
-              onChange={(e) => setPlanType(e.target.value)}
-              className={inputClass}
-            >
-              <option value="XY">XY</option>
-              <option value="YZ">YZ</option>
-              <option value="XZ">XZ</option>
-            </select>
+      {/* ---- EXECUTION MODE ---- */}
+      <ExecutionMode
+        sectionClass={sectionClass}
+        mode={mode}
+        setMode={setMode}
+      />
 
-            <label className={labelClass}>Position (n, m)</label>
-            <input
-              type="text"
-              value={planPosition}
-              onChange={(e) => setPlanPosition(e.target.value)}
-              className={inputClass}
-            />
-          </div>
-        ) : (
-          <div className="mt-3">
-            <label className={labelClass}>Équation</label>
-            <input
-              type="text"
-              value={analysisEquation}
-              onChange={(e) => setAnalysisEquation(e.target.value)}
-              className={inputClass}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* ---- MODE ---- */}
-      <div className={sectionClass}>
-        <h3 className="text-md font-semibold text-orange-500 mb-2">
-          Mode d’exécution
-        </h3>
-        <button
-          onClick={() => setMode((prev) => (prev === 1 ? 0 : 1))}
-          className={`w-full px-3 py-2 rounded font-semibold transition ${
-            mode === 1
-              ? "bg-blue-600 text-white hover:bg-blue-500"
-              : "bg-green-600 text-white hover:bg-green-500"
-          }`}
-        >
-          {mode === 1 ? "Séquentielle" : "Parallèle"}
-        </button>
-      </div>
 
       {/* ---- SOURCE ---- */}
-      <div className={sectionClass}>
-        <h3 className="text-md font-semibold text-orange-500 mb-2">Source</h3>
-        <label className={labelClass}>Type de source</label>
-        <select
-          value={sourceType}
-          onChange={(e) => setSourceType(e.target.value)}
-          className={inputClass}
-        >
-          <option value="Pointue">Pointue</option>
-          <option value="Large">Large</option>
-        </select>
-
-        <label className={labelClass} style={{ marginTop: "0.5rem" }}>
-          Position (x, y, z)
-        </label>
-        <input
-          type="text"
-          value={sourcePos}
-          onChange={(e) => setSourcePos(e.target.value)}
-          placeholder="ex: 0,3,0"
-          className={inputClass}
-        />
-
-        {sourceType === "Large" && (
-          <div className="flex gap-2 mt-2">
-            <div className="flex-1">
-              <label className={labelClass}>Largeur</label>
-              <input
-                type="number"
-                value={sourceSize.width}
-                onChange={(e) =>
-                  setSourceSize({
-                    ...sourceSize,
-                    width: Number(e.target.value),
-                  })
-                }
-                className={inputClass}
-              />
-            </div>
-            <div className="flex-1">
-              <label className={labelClass}>Hauteur</label>
-              <input
-                type="number"
-                value={sourceSize.height}
-                onChange={(e) =>
-                  setSourceSize({
-                    ...sourceSize,
-                    height: Number(e.target.value),
-                  })
-                }
-                className={inputClass}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      <SourceSelection
+        sectionClass={sectionClass}
+        labelClass={labelClass}
+        inputClass={inputClass}
+        sourceType={sourceType}
+        setSourceType={setSourceType}
+        sourcePos={sourcePos}
+        setSourcePos={setSourcePos}
+        sourceSize={sourceSize}
+        setSourceSize={setSourceSize}
+      />
 
       {/* ---- GÉOMÉTRIE ---- */}
-      <div className={sectionClass}>
-        <h3 className="text-md font-semibold text-orange-500 mb-2">
-          Géométrie
-        </h3>
-        <label className={labelClass}>Type</label>
-        <select
-          value={geometryType}
-          onChange={handleGeometryTypeChange}
-          className={inputClass}
-        >
-          {Object.keys(geometryDefinitions).map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-
-        <div className="mt-2 flex flex-col gap-2">
-          {Object.entries(geometryParams).map(([key, value]) => (
-            <div key={key}>
-              <label className={labelClass}>{key}</label>
-              <input
-                type="text"
-                value={String(value)}
-                onChange={(e) => handleParamChange(key, e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          ))}
-        </div>
-
-        {geometryType === "Quelconque" && (
-          <>
-            <label className={labelClass} style={{ marginTop: "0.5rem" }}>
-              Équation
-            </label>
-            <input
-              type="text"
-              value={geometryEquation}
-              onChange={(e) => setGeometryEquation(e.target.value)}
-              className={inputClass}
-            />
-          </>
-        )}
-
-        <button
-          onClick={handleAddGeometry}
-          className={`mt-3 w-full px-3 py-2 rounded font-medium text-sm ${
-            darkMode
-              ? "bg-blue-600 hover:bg-blue-500 text-white"
-              : "bg-blue-500 hover:bg-blue-400 text-white"
-          }`}
-        >
-          Ajouter la géométrie
-        </button>
-
-        <GeometryList
-          darkMode={darkMode}
-          geometries={geometries}
-          onRemoveGeometry={handleRemoveGeometry}
-        />
-      </div>
+      <GeometrySelection
+        labelClass={labelClass}
+        inputClass={inputClass}
+        sectionClass={sectionClass}
+        geometryType={geometryType}
+        handleGeometryTypeChange={handleGeometryTypeChange}
+        geometryDefinitions={geometryDefinitions}
+        geometryParams={geometryParams}
+        handleParamChange={handleParamChange}
+        geometryEquation={geometryEquation}
+        setGeometryEquation={setGeometryEquation}
+        handleAddGeometry={handleAddGeometry}
+        darkMode={darkMode}
+        geometries={geometries}
+        onRemoveGeometry={handleRemoveGeometry}
+      />
 
       {/* ---- RAYONS ---- */}
-      <div className={sectionClass}>
-        <h3 className="text-md font-semibold text-orange-500 mb-2">Rayons</h3>
-        <label className={labelClass}>Nombre de rayons</label>
-        <input
-          type="number"
-          value={rayCount}
-          onChange={(e) => setRayCount(Number(e.target.value))}
-          className={inputClass}
-        />
-      </div>
+      <RaysInput
+        sectionClass={sectionClass}
+        labelClass={labelClass}
+        inputClass={inputClass}
+        rayCount={rayCount}
+        setRayCount={setRayCount}
+      />
 
       {/* ---- APPLY ---- */}
       <button
