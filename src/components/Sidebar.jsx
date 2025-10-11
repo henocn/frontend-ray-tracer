@@ -16,7 +16,7 @@ const geometryDefinitions = {
 const Sidebar = ({ darkMode, onApplyConfig }) => {
   // ---- SOURCE ----
   const [sourceType, setSourceType] = useState("Pointue");
-  const [sourcePos, setSourcePos] = useState("0,3,-150000000");
+  const [sourcePos, setSourcePos] = useState("0,30000000,-150000000");
   const [sourceSize, setSourceSize] = useState({ width: 1, height: 1 });
 
   // ---- GÉOMÉTRIE ----
@@ -28,7 +28,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   const [geometries, setGeometries] = useState([]);
 
   // ---- RAYONS ----
-  const [rayCount, setRayCount] = useState(500);
+  const [rayCount, setRayCount] = useState(3000);
 
   // ---- ANALYSE ----
   const [analysisType, setAnalysisType] = useState("Plan");

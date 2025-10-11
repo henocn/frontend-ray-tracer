@@ -9,6 +9,7 @@ import CustomAxes from "../utils/Axes";
 
 export default function Scene({ sceneData }) {
   const geomRefs = useRef([]);
+  const raysCountRef = useRef();
   const [rays, setRays] = useState([]);
 
   useEffect(() => {
@@ -22,12 +23,12 @@ export default function Scene({ sceneData }) {
           sceneData.source,
           geomRefs.current,
           sceneData.scene.geometries,
-          300,
-          5000
+          2000,
+          50000
         );
         if (mounted) setRays(generated);
       } else {
-        setTimeout(tryGenerate, 50);
+        setTimeout(tryGenerate, 5000);
       }
     };
 
@@ -45,7 +46,7 @@ export default function Scene({ sceneData }) {
       camera={{ position: [10, 4, 14], fov: 40 }}
     >
       <ambientLight intensity={0.3} />
-      <directionalLight position={[0, 2000, -150000000]} intensity={1} />
+      <directionalLight position={[0,30000000, -150000000]} intensity={1} />
       <OrbitControls />
       <CustomAxes size={30} divisions={30} />
 
