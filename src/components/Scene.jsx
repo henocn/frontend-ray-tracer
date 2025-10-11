@@ -47,7 +47,7 @@ export default function Scene({ sceneData }) {
       <ambientLight intensity={0.3} />
       <directionalLight position={[0, 2000, -150000000]} intensity={1} />
       <OrbitControls />
-      <CustomAxes size={10} divisions={30} />
+      <CustomAxes size={30} divisions={30} />
 
       {sceneData.scene.geometries.map((geom, i) => (
         <Geometry

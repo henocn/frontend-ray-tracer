@@ -10,12 +10,12 @@ const geometryDefinitions = {
 };
 
 const Sidebar = ({ darkMode, onApplyConfig }) => {
-  // Source
+  // ---- SOURCE ----
   const [sourceType, setSourceType] = useState("Pointue");
   const [sourcePos, setSourcePos] = useState("0,3,-150000000");
   const [sourceSize, setSourceSize] = useState({ width: 1, height: 1 });
 
-  // Géométrie
+  // ---- GÉOMÉTRIE ----
   const [geometryType, setGeometryType] = useState("Parabolic");
   const [geometryParams, setGeometryParams] = useState(
     geometryDefinitions["Parabolic"]
@@ -23,8 +23,17 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   const [geometryEquation, setGeometryEquation] = useState("z = x*x + y*y");
   const [geometries, setGeometries] = useState([]);
 
-  // Rayons
+  // ---- RAYONS ----
   const [rayCount, setRayCount] = useState(500);
+
+  // ---- ANALYSE ----
+  const [analysisType, setAnalysisType] = useState("Plan");
+  const [planType, setPlanType] = useState("XY");
+  const [planPosition, setPlanPosition] = useState("0,0,0");
+  const [analysisEquation, setAnalysisEquation] = useState("z = x*x + y*y");
+
+  // ---- MODE (Séquentiel / Parallèle) ----
+  const [mode, setMode] = useState(1); // 1 = Séquentiel, 0 = Parallèle
 
   // Changement type géométrie
   const handleGeometryTypeChange = (e) => {
@@ -34,7 +43,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
     if (newType === "Quelconque") setGeometryEquation("z = x*x + y*y");
   };
 
-  // Changement paramètre
+  // Changement paramètre géométrie
   const handleParamChange = (key, value) => {
     setGeometryParams({ ...geometryParams, [key]: value });
   };
@@ -49,11 +58,6 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
       equation: geometryType === "Quelconque" ? geometryEquation : undefined,
     };
     setGeometries((prev) => [...prev, newGeometry]);
-
-    // Reset des champs pour nouvelle géométrie
-    setGeometryType("Parabolic");
-    setGeometryParams(geometryDefinitions["Parabolic"]);
-    setGeometryEquation("z = x*x + y*y");
   };
 
   // Supprimer une géométrie
@@ -61,20 +65,30 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
     setGeometries((prev) => prev.filter((g) => g.id !== id));
   };
 
-  // Appliquer la configuration et générer le JSON
+  // ---- Construire et envoyer le JSON ----
   const handleApply = () => {
     const parsedSourcePos = sourcePos.split(",").map((v) => Number(v.trim()));
 
     const data = {
+      analysis: {
+        type: analysisType,
+        params:
+          analysisType === "Plan"
+            ? {
+                plan: planType,
+                position: planPosition.split(",").map((v) => Number(v.trim())),
+              }
+            : {
+                equation: analysisEquation,
+              },
+      },
       scene: {
         geometries: geometries.map((geo) => {
           const parsedPos = geo.params.position
             ? geo.params.position.split(",").map((v) => Number(v.trim()))
             : [0, 0, 0];
-
           const cleanParams = { ...geo.params, position: parsedPos };
           if (geo.type === "Quelconque") cleanParams.equation = geo.equation;
-
           return { type: geo.type, params: cleanParams };
         }),
       },
@@ -87,61 +101,172 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         },
       },
       rayCount,
+      mode, // 1 = séquentiel, 0 = parallèle
     };
 
     console.log("🧩 Données JSON construites :", data);
     if (onApplyConfig) onApplyConfig(data);
   };
 
-  // Styles
+  // ---- Styles ----
   const sectionClass = `rounded-xl p-3 mb-4 border ${
-    darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-300 shadow-sm"
+    darkMode
+      ? "bg-slate-800 border-slate-700"
+      : "bg-white border-slate-300 shadow-sm"
   }`;
   const labelClass = "text-sm font-medium mb-1";
   const inputClass = `px-2 py-1 rounded border text-sm w-full ${
-    darkMode ? "bg-slate-700 border-slate-600" : "bg-white border-slate-300"
+    darkMode
+      ? "bg-slate-700 border-slate-600"
+      : "bg-white border-slate-300"
   }`;
 
   return (
     <aside
       className={`w-72 h-full flex flex-col p-4 border-r overflow-y-auto transition-all duration-300
-      ${darkMode ? "bg-slate-900 border-slate-800 text-slate-200" : "bg-slate-100 border-slate-300 text-slate-800"}`}
+      ${
+        darkMode
+          ? "bg-slate-900 border-slate-800 text-slate-200"
+          : "bg-slate-100 border-slate-300 text-slate-800"
+      }`}
     >
-      <h2 className="text-lg font-semibold mb-4 text-orange-400">Configuration</h2>
+      <h2 className="text-lg font-semibold mb-4 text-orange-400">
+        Configuration
+      </h2>
 
-      {/* SOURCE */}
+      {/* ---- TYPE D’ANALYSE ---- */}
+      <div className={sectionClass}>
+        <h3 className="text-md font-semibold text-orange-500 mb-2">
+          Type d’analyse
+        </h3>
+        <select
+          value={analysisType}
+          onChange={(e) => setAnalysisType(e.target.value)}
+          className={inputClass}
+        >
+          <option value="Plan">Plan</option>
+          <option value="Géométrie quelconque">Géométrie quelconque</option>
+        </select>
+
+        {analysisType === "Plan" ? (
+          <div className="mt-3 flex flex-col gap-2">
+            <label className={labelClass}>Plan</label>
+            <select
+              value={planType}
+              onChange={(e) => setPlanType(e.target.value)}
+              className={inputClass}
+            >
+              <option value="XY">XY</option>
+              <option value="YZ">YZ</option>
+              <option value="XZ">XZ</option>
+            </select>
+
+            <label className={labelClass}>Position (x, y, z)</label>
+            <input
+              type="text"
+              value={planPosition}
+              onChange={(e) => setPlanPosition(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+        ) : (
+          <div className="mt-3">
+            <label className={labelClass}>Équation</label>
+            <input
+              type="text"
+              value={analysisEquation}
+              onChange={(e) => setAnalysisEquation(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ---- MODE ---- */}
+      <div className={sectionClass}>
+        <h3 className="text-md font-semibold text-orange-500 mb-2">
+          Mode d’exécution
+        </h3>
+        <button
+          onClick={() => setMode((prev) => (prev === 1 ? 0 : 1))}
+          className={`w-full px-3 py-2 rounded font-semibold transition ${
+            mode === 1
+              ? "bg-blue-600 text-white hover:bg-blue-500"
+              : "bg-green-600 text-white hover:bg-green-500"
+          }`}
+        >
+          {mode === 1 ? "Séquentielle" : "Parallèle"}
+        </button>
+      </div>
+
+      {/* ---- SOURCE ---- */}
       <div className={sectionClass}>
         <h3 className="text-md font-semibold text-orange-500 mb-2">Source</h3>
         <label className={labelClass}>Type de source</label>
-        <select value={sourceType} onChange={(e) => setSourceType(e.target.value)} className={inputClass}>
+        <select
+          value={sourceType}
+          onChange={(e) => setSourceType(e.target.value)}
+          className={inputClass}
+        >
           <option value="Pointue">Pointue</option>
           <option value="Large">Large</option>
         </select>
 
-        <label className={labelClass} style={{ marginTop: "0.5rem" }}>Position (x, y, z)</label>
-        <input type="text" value={sourcePos} onChange={(e) => setSourcePos(e.target.value)} placeholder="ex: 0,3,0" className={inputClass} />
+        <label className={labelClass} style={{ marginTop: "0.5rem" }}>
+          Position (x, y, z)
+        </label>
+        <input
+          type="text"
+          value={sourcePos}
+          onChange={(e) => setSourcePos(e.target.value)}
+          placeholder="ex: 0,3,0"
+          className={inputClass}
+        />
 
         {sourceType === "Large" && (
           <div className="flex gap-2 mt-2">
             <div className="flex-1">
               <label className={labelClass}>Largeur</label>
-              <input type="number" value={sourceSize.width} onChange={(e) => setSourceSize({ ...sourceSize, width: Number(e.target.value) })} className={inputClass} />
+              <input
+                type="number"
+                value={sourceSize.width}
+                onChange={(e) =>
+                  setSourceSize({ ...sourceSize, width: Number(e.target.value) })
+                }
+                className={inputClass}
+              />
             </div>
             <div className="flex-1">
               <label className={labelClass}>Hauteur</label>
-              <input type="number" value={sourceSize.height} onChange={(e) => setSourceSize({ ...sourceSize, height: Number(e.target.value) })} className={inputClass} />
+              <input
+                type="number"
+                value={sourceSize.height}
+                onChange={(e) =>
+                  setSourceSize({
+                    ...sourceSize,
+                    height: Number(e.target.value),
+                  })
+                }
+                className={inputClass}
+              />
             </div>
           </div>
         )}
       </div>
 
-      {/* GÉOMÉTRIE */}
+      {/* ---- GÉOMÉTRIE ---- */}
       <div className={sectionClass}>
         <h3 className="text-md font-semibold text-orange-500 mb-2">Géométrie</h3>
         <label className={labelClass}>Type</label>
-        <select value={geometryType} onChange={handleGeometryTypeChange} className={inputClass}>
+        <select
+          value={geometryType}
+          onChange={handleGeometryTypeChange}
+          className={inputClass}
+        >
           {Object.keys(geometryDefinitions).map((type) => (
-            <option key={type} value={type}>{type}</option>
+            <option key={type} value={type}>
+              {type}
+            </option>
           ))}
         </select>
 
@@ -151,7 +276,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
               <label className={labelClass}>{key}</label>
               <input
                 type="text"
-                value={Array.isArray(value) ? value.join(",") : String(value)}
+                value={String(value)}
                 onChange={(e) => handleParamChange(key, e.target.value)}
                 className={inputClass}
               />
@@ -161,15 +286,24 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
 
         {geometryType === "Quelconque" && (
           <>
-            <label className={labelClass} style={{ marginTop: "0.5rem" }}>Équation</label>
-            <input type="text" value={geometryEquation} onChange={(e) => setGeometryEquation(e.target.value)} className={inputClass} />
+            <label className={labelClass} style={{ marginTop: "0.5rem" }}>
+              Équation
+            </label>
+            <input
+              type="text"
+              value={geometryEquation}
+              onChange={(e) => setGeometryEquation(e.target.value)}
+              className={inputClass}
+            />
           </>
         )}
 
         <button
           onClick={handleAddGeometry}
           className={`mt-3 w-full px-3 py-2 rounded font-medium text-sm ${
-            darkMode ? "bg-blue-600 hover:bg-blue-500 text-white" : "bg-blue-500 hover:bg-blue-400 text-white"
+            darkMode
+              ? "bg-blue-600 hover:bg-blue-500 text-white"
+              : "bg-blue-500 hover:bg-blue-400 text-white"
           }`}
         >
           Ajouter la géométrie
@@ -177,12 +311,25 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
 
         {geometries.length > 0 && (
           <div className="mt-3">
-            <h4 className="text-sm font-semibold mb-2 text-orange-400">Géométries ajoutées</h4>
+            <h4 className="text-sm font-semibold mb-2 text-orange-400">
+              Géométries ajoutées
+            </h4>
             <ul className="space-y-1">
               {geometries.map((geo) => (
-                <li key={geo.id} className={`flex items-center justify-between text-sm p-1 rounded ${darkMode ? "bg-slate-700" : "bg-slate-200"}`}>
-                  <span>{geo.type} #{geo.id}</span>
-                  <Trash2 size={16} className="cursor-pointer text-red-400 hover:text-red-500" onClick={() => handleRemoveGeometry(geo.id)} />
+                <li
+                  key={geo.id}
+                  className={`flex items-center justify-between text-sm p-1 rounded ${
+                    darkMode ? "bg-slate-700" : "bg-slate-200"
+                  }`}
+                >
+                  <span>
+                    {geo.type} #{geo.id}
+                  </span>
+                  <Trash2
+                    size={16}
+                    className="cursor-pointer text-red-400 hover:text-red-500"
+                    onClick={() => handleRemoveGeometry(geo.id)}
+                  />
                 </li>
               ))}
             </ul>
@@ -190,17 +337,25 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         )}
       </div>
 
-      {/* RAYONS */}
+      {/* ---- RAYONS ---- */}
       <div className={sectionClass}>
         <h3 className="text-md font-semibold text-orange-500 mb-2">Rayons</h3>
         <label className={labelClass}>Nombre de rayons</label>
-        <input type="number" value={rayCount} onChange={(e) => setRayCount(Number(e.target.value))} className={inputClass} />
+        <input
+          type="number"
+          value={rayCount}
+          onChange={(e) => setRayCount(Number(e.target.value))}
+          className={inputClass}
+        />
       </div>
 
+      {/* ---- APPLY ---- */}
       <button
         onClick={handleApply}
         className={`mt-2 px-3 py-2 rounded font-medium text-sm ${
-          darkMode ? "bg-orange-600 hover:bg-orange-500 text-white" : "bg-orange-500 hover:bg-orange-400 text-white"
+          darkMode
+            ? "bg-orange-600 hover:bg-orange-500 text-white"
+            : "bg-orange-500 hover:bg-orange-400 text-white"
         }`}
       >
         Appliquer la configuration
