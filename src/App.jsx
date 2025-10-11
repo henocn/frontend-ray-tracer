@@ -29,6 +29,7 @@ function App() {
         <div className="flex-1 h-full">
           {/* Passe le JSON comme prop à Scene */}
           <Scene sceneData={sceneConfig} />
+          {/* <Test /> */}
         </div>
       </div>
     </div>
