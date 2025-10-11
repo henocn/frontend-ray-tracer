@@ -6,6 +6,11 @@ Logiciel de modélisation 2D 3D, de répresentation et analyse de donnée
 **Météorlogique**
 **Thermodynamique**
 
+
+Type d'analyses
+plan (plan xy yz ou xz puis la position du plan) 
+gométrie quelconque (équation de la géométrie)
+ 
 ```
 const data = {
   scene: {
