@@ -33,7 +33,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   // ---- ANALYSE ----
   const [analysisType, setAnalysisType] = useState("Plan");
   const [planType, setPlanType] = useState("XY");
-  const [planPosition, setPlanPosition] = useState("0,0");
+  const [planPosition, setPlanPosition] = useState("0");
   const [analysisEquation, setAnalysisEquation] = useState("x*x + y*y");
 
   // ---- MODE (Séquentiel / Parallèle) ----

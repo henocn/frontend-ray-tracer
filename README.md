@@ -10,6 +10,9 @@ Logiciel de modélisation 2D 3D, de répresentation et analyse de donnée
 Type d'analyses
 plan (plan xy yz ou xz puis la position du plan) 
 gométrie quelconque (équation de la géométrie)
+
+11/10/2025
+Revoir l'affichage du boutton afin d'indiquer aux utilisateur les deux valeur de l'état du boutton
  
 ```
 const data = {
