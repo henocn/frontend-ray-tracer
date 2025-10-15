@@ -1,20 +1,58 @@
-import React, { forwardRef } from "react"
-import Cylindric from "./geometries/Cylindric"
-import Parabolic from "./geometries/Parabolic"
-import RingArray from "./geometries/RingArray"
+import React, { forwardRef } from "react";
+import Cylindric from "./geometries/Cylindric";
+import Parabolic from "./geometries/Parabolic";
+import RingArray from "./geometries/RingArray";
+import GenericEquationSurface from "./geometries/GenericEquationSurface";
 
 const Geometry = forwardRef(({ geom }, ref) => {
-  if (!geom) return null
-  switch (geom.type) {
-    case "Cylindric":
-      return <Cylindric ref={ref} params={geom.params} />
-    case "Parabolic":
-      return <Parabolic ref={ref} params={geom.params} />
-    case "RingArray":
-      return <RingArray ref={ref} params={geom.params} />
-    default:
-      return null
-  }
-})
+  if (!geom) return null;
 
-export default Geometry
+  const { type, params, equation, boundaries } = geom;
+
+  switch (type) {
+    case "Cylindric":
+      return (
+        <Cylindric
+          ref={ref}
+          params={params}
+          equation={equation}
+          boundaries={boundaries}
+        />
+      );
+
+    case "Parabolic":
+      return (
+        <Parabolic
+          ref={ref}
+          params={params}
+          equation={equation}
+          boundaries={boundaries}
+        />
+      );
+
+    case "RingArray":
+      return (
+        <RingArray
+          ref={ref}
+          params={params}
+          equation={equation}
+          boundaries={boundaries}
+        />
+      );
+
+    case "Quelconque":
+      return (
+        <GenericEquationSurface
+          ref={ref}
+          equation={geom.params.equation || equation}
+          boundaries={boundaries}
+          position={params.position || [0, 0, 0]}
+        />
+      );
+
+    default:
+      return null;
+  }
+});
+
+export default Geometry;

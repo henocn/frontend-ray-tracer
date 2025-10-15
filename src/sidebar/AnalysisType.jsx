@@ -28,7 +28,7 @@ const AnalysisType = ({ sectionClass, analysisType, setAnalysisType, planType, s
             <option value="XZ">XZ</option>
           </select>
 
-          <label className={labelClass}>Position (n, m)</label>
+          <label className={labelClass}>Position</label>
           <input
             type="text"
             value={planPosition}
@@ -38,7 +38,7 @@ const AnalysisType = ({ sectionClass, analysisType, setAnalysisType, planType, s
         </div>
       ) : (
         <div className="mt-3">
-          <label className={labelClass}>Équation</label>
+          <label className={labelClass}>Équation z = f(x, y)</label>
           <input
             type="text"
             value={analysisEquation}

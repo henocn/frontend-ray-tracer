@@ -7,9 +7,10 @@ import { getGeometryBoundaries } from "./boundaries.js"
 function samplePointOnSurface(geom) {
   const type = geom.type
   const p = geom.params || {}
+  const boundaries = geom.boundaries || {}
 
   // récupérer les bornes
-  const b = getGeometryBoundaries(type, p)
+  const b = getGeometryBoundaries(type, p, boundaries)
 
   if (type === "Parabolic") {
     const x_local = Math.random() * (b.xmax - b.xmin) + b.xmin

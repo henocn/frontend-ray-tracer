@@ -10,13 +10,13 @@ const geometryDefinitions = {
   Parabolic: { f_x: 0.5, f_y: 0.8, size: 3, position: "0,1.4,0" },
   Cylindric: { size: 2, height: 1.5, position: "0,0,0" },
   RingArray: { innerRadius: 1, outerRadius: 2, count: 8, position: "0,0,0" },
-  Quelconque: { equation: "x*x + y*y" },
+  Quelconque: { equation: "x*x + y*y", position: "0,0,0" },
 };
 
 const Sidebar = ({ darkMode, onApplyConfig }) => {
   // ---- SOURCE ----
   const [sourceType, setSourceType] = useState("Pointue");
-  const [sourcePos, setSourcePos] = useState("0,3,-150000000");
+  const [sourcePos, setSourcePos] = useState("0,30000000,-150000000");
   const [sourceSize, setSourceSize] = useState({ width: 1, height: 1 });
 
   // ---- GÉOMÉTRIE ----
@@ -28,12 +28,12 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   const [geometries, setGeometries] = useState([]);
 
   // ---- RAYONS ----
-  const [rayCount, setRayCount] = useState(500);
+  const [rayCount, setRayCount] = useState(3000);
 
   // ---- ANALYSE ----
   const [analysisType, setAnalysisType] = useState("Plan");
   const [planType, setPlanType] = useState("XY");
-  const [planPosition, setPlanPosition] = useState("0,0");
+  const [planPosition, setPlanPosition] = useState("0");
   const [analysisEquation, setAnalysisEquation] = useState("x*x + y*y");
 
   // ---- MODE (Séquentiel / Parallèle) ----
@@ -91,9 +91,29 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
           const parsedPos = geo.params.position
             ? geo.params.position.split(",").map((v) => Number(v.trim()))
             : [0, 0, 0];
+
+          // Nettoyage des paramètres
           const cleanParams = { ...geo.params, position: parsedPos };
-          if (geo.type === "Quelconque") cleanParams.equation = geo.equation;
-          return { type: geo.type, params: cleanParams };
+
+          // On ajoute equation et boundaries
+          const equation =
+            geo.type === "Quelconque"
+              ? geo.equation
+              : `z = f(${geo.type.toLowerCase()})`;
+
+          // Exemple de boundaries simples selon le "size" (juste pour test)
+          const size = geo.params.size || 3;
+          const boundaries = [
+            [-size, -size, -size],
+            [size, size, size],
+          ];
+
+          return {
+            type: geo.type,
+            params: cleanParams,
+            equation,
+            boundaries,
+          };
         }),
       },
       source: {
@@ -108,7 +128,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
       mode, // 1 = séquentiel, 0 = parallèle
     };
 
-    console.log("Débug : ", data);
+    console.log("JSON envoyé à Scene :", data);
     if (onApplyConfig) onApplyConfig(data);
   };
 
@@ -157,7 +177,6 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         mode={mode}
         setMode={setMode}
       />
-
 
       {/* ---- SOURCE ---- */}
       <SourceSelection
