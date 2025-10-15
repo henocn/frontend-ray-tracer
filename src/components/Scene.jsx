@@ -9,7 +9,6 @@ import CustomAxes from "../utils/Axes";
 
 export default function Scene({ sceneData }) {
   const geomRefs = useRef([]);
-  const raysCountRef = useRef();
   const [rays, setRays] = useState([]);
 
   useEffect(() => {

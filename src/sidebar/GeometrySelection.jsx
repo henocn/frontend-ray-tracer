@@ -10,8 +10,6 @@ const GeometrySelection = ({
   geometryDefinitions,
   geometryParams,
   handleParamChange,
-  geometryEquation,
-  setGeometryEquation,
   handleAddGeometry,
   darkMode,
   geometries,
