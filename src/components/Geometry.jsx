@@ -44,7 +44,7 @@ const Geometry = forwardRef(({ geom }, ref) => {
       return (
         <GenericEquationSurface
           ref={ref}
-          equation={equation}
+          equation={geom.params.equation || equation}
           boundaries={boundaries}
         />
       );
