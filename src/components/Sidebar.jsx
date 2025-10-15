@@ -10,7 +10,7 @@ const geometryDefinitions = {
   Parabolic: { f_x: 0.5, f_y: 0.8, size: 3, position: "0,1.4,0" },
   Cylindric: { size: 2, height: 1.5, position: "0,0,0" },
   RingArray: { innerRadius: 1, outerRadius: 2, count: 8, position: "0,0,0" },
-  Quelconque: { equation: "x*x + y*y" },
+  Quelconque: { equation: "x*x + y*y", position: "0,0,0" },
 };
 
 const Sidebar = ({ darkMode, onApplyConfig }) => {

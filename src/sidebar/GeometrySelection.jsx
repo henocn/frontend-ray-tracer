@@ -47,7 +47,7 @@ const GeometrySelection = ({
         ))}
       </div>
 
-      {geometryType === "Quelconque" && (
+      {/* {geometryType === "Quelconque" && (
         <>
           <label className={labelClass} style={{ marginTop: "0.5rem" }}>
             Équation
@@ -59,7 +59,7 @@ const GeometrySelection = ({
             className={inputClass}
           />
         </>
-      )}
+      )} */}
 
       <button
         onClick={handleAddGeometry}

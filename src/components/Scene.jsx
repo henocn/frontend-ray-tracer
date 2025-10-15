@@ -23,7 +23,7 @@ export default function Scene({ sceneData }) {
           sceneData.source,
           geomRefs.current,
           sceneData.scene.geometries,
-          5000,
+          500,
           50000
         );
         if (mounted) setRays(generated);
