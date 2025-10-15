@@ -4,9 +4,9 @@ import * as THREE from "three";
 /**
  * Surface 3D à partir d'une équation (z = f(x, y))
  * Bornée par `boundaries`, sans bord carré visible.
+ * `position` déplace la surface dans l'espace.
  */
-const GenericEquationSurface = forwardRef(({ equation, boundaries }, ref) => {
-    console.log(equation);
+const GenericEquationSurface = forwardRef(({ equation, boundaries, position = [0,0,0] }, ref) => {
   const geometry = useMemo(() => {
     if (!equation || !boundaries) return null;
 
@@ -15,7 +15,13 @@ const GenericEquationSurface = forwardRef(({ equation, boundaries }, ref) => {
     const [xMax, yMax, zMax] = max;
 
     // Nettoyer et préparer l'équation
-    const cleanEq = equation.replace(/^z\s*=\s*/i, "").trim();
+    let cleanEq = equation.replace(/^z\s*=\s*/i, "").trim();
+
+    // Remplacer les fonctions mathématiques JS
+    cleanEq = cleanEq
+      .replace(/\b(sin|cos|tan|exp|log|sqrt|abs)\b/g, "Math.$1")
+      .replace(/\^/g, "**");
+
     let func;
     try {
       func = new Function("x", "y", `return ${cleanEq}`);
@@ -24,7 +30,7 @@ const GenericEquationSurface = forwardRef(({ equation, boundaries }, ref) => {
       return null;
     }
 
-    const segments = 1000;
+    const segments = 150;
     const dx = (xMax - xMin) / segments;
     const dy = (yMax - yMin) / segments;
 
@@ -69,7 +75,6 @@ const GenericEquationSurface = forwardRef(({ equation, boundaries }, ref) => {
         const minZ = Math.min(zA, zB, zC, zD);
         const delta = Math.abs(avg - minZ);
 
-        // Supprime les triangles presque plats
         if (delta > 0.001) {
           indices.push(a, b, d);
           indices.push(a, d, c);
@@ -77,7 +82,6 @@ const GenericEquationSurface = forwardRef(({ equation, boundaries }, ref) => {
       }
     }
 
-    // --- Construction de la géométrie
     const geom = new THREE.BufferGeometry();
     geom.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
     geom.setIndex(indices);
@@ -89,7 +93,7 @@ const GenericEquationSurface = forwardRef(({ equation, boundaries }, ref) => {
   if (!geometry) return null;
 
   return (
-    <mesh ref={ref} geometry={geometry}>
+    <mesh ref={ref} geometry={geometry} position={new THREE.Vector3(...position)}>
       <meshStandardMaterial
         color="#E67E22"
         roughness={0.5}

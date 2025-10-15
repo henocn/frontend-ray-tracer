@@ -1,4 +1,4 @@
-export function getGeometryBoundaries(type, params) {
+export function getGeometryBoundaries(type, params, boundaries) {
   switch (type) {
     case "Parabolic": {
       const { f_x = 0.5, f_y = 0.8, size = 3, position = [0, 0, 0] } = params
@@ -53,12 +53,12 @@ export function getGeometryBoundaries(type, params) {
     case "Quelconque": {
       const {
         equation = "z = f(x, y)",
-        xmin = -1,
-        xmax = 1,
-        ymin = -1,
-        ymax = 1,
-        zmin = -1,
-        zmax = 1,
+        xmin = boundaries[0][0] || -1,
+        xmax = boundaries[1][0] || 1,
+        ymin = boundaries[0][1] || -1,
+        ymax = boundaries[1][1] || 1,
+        zmin = boundaries[0][2] || -1,
+        zmax = boundaries[1][2] || 1,
       } = params
 
       return {

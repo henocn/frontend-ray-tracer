@@ -46,6 +46,7 @@ const Geometry = forwardRef(({ geom }, ref) => {
           ref={ref}
           equation={geom.params.equation || equation}
           boundaries={boundaries}
+          position={params.position || [0, 0, 0]}
         />
       );
 
