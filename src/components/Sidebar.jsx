@@ -91,9 +91,29 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
           const parsedPos = geo.params.position
             ? geo.params.position.split(",").map((v) => Number(v.trim()))
             : [0, 0, 0];
+
+          // Nettoyage des paramètres
           const cleanParams = { ...geo.params, position: parsedPos };
-          if (geo.type === "Quelconque") cleanParams.equation = geo.equation;
-          return { type: geo.type, params: cleanParams };
+
+          // On ajoute equation et boundaries
+          const equation =
+            geo.type === "Quelconque"
+              ? geo.equation
+              : `z = f(${geo.type.toLowerCase()})`;
+
+          // Exemple de boundaries simples selon le "size" (juste pour test)
+          const size = geo.params.size || 3;
+          const boundaries = [
+            [-size, -size, -size],
+            [size, size, size],
+          ];
+
+          return {
+            type: geo.type,
+            params: cleanParams,
+            equation,
+            boundaries,
+          };
         }),
       },
       source: {
@@ -108,7 +128,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
       mode, // 1 = séquentiel, 0 = parallèle
     };
 
-    console.log("Débug : ", data);
+    console.log("JSON envoyé à Scene :", data);
     if (onApplyConfig) onApplyConfig(data);
   };
 
@@ -157,7 +177,6 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         mode={mode}
         setMode={setMode}
       />
-
 
       {/* ---- SOURCE ---- */}
       <SourceSelection
