@@ -4,7 +4,7 @@ import { extend } from "@react-three/fiber"
 import { ParametricGeometry } from "three/examples/jsm/geometries/ParametricGeometry.js"
 import { Edges } from "@react-three/drei"
 
-extend({ ParametricGeometry }) // doit être exécuté avant le rendu
+extend({ ParametricGeometry })
 
 const Parabolic = forwardRef(({ params }, ref) => {
   if (!params) return null

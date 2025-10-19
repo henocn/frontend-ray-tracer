@@ -102,7 +102,7 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
               : `z = f(${geo.type.toLowerCase()})`;
 
           // Exemple de boundaries simples selon le "size" (juste pour test)
-          const size = geo.params.size || 3;
+          const size = geo.params.size || 5;
           const boundaries = [
             [-size, -size, -size],
             [size, size, size],
