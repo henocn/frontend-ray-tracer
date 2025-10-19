@@ -6,7 +6,7 @@ import Source from "./Source";
 import Rays from "./Rays";
 import { generateRays } from "../utils/generateRays";
 import CustomAxes from "../utils/Axes";
-import axiosInstance from "../axiosApi"; 
+import axiosInstance from "../axiosApi";
 
 
 
@@ -14,27 +14,47 @@ export default function Scene({ sceneData }) {
   const geomRefs = useRef([]);
   const [rays, setRays] = useState([]);
 
+  // useEffect(() => {
+  //   if (!sceneData) return;
+  //   let mounted = true;
+
+  //   const tryGenerate = () => {
+  //     const readyCount = geomRefs.current.filter(Boolean).length;
+  //     if (readyCount === sceneData.scene.geometries.length) {
+  //       const generated = generateRays(
+  //         sceneData.source,
+  //         geomRefs.current,
+  //         sceneData.scene.geometries,
+  //         50,
+  //         5000
+  //       );
+  //       if (mounted) setRays(generated);
+  //     } else {
+  //       setTimeout(tryGenerate, 5000);
+  //     }
+  //   };
+
+  //   tryGenerate();
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, [sceneData]);
+
+  // utilisation de l'api pour générer les rays
   useEffect(() => {
     if (!sceneData) return;
     let mounted = true;
 
-    const tryGenerate = () => {
-      const readyCount = geomRefs.current.filter(Boolean).length;
-      if (readyCount === sceneData.scene.geometries.length) {
-        const generated = generateRays(
-          sceneData.source,
-          geomRefs.current,
-          sceneData.scene.geometries,
-          50,
-          5000
-        );
-        if (mounted) setRays(generated);
-      } else {
-        setTimeout(tryGenerate, 5000);
+    const generateRays = async () => {
+      try {
+          const response = await axiosInstance.get("/test/");
+        if (mounted) setRays(response.data.rays);
+      } catch (error) {
+        console.error("Error generating rays:", error);
       }
     };
 
-    tryGenerate();
+    generateRays();
     return () => {
       mounted = false;
     };
