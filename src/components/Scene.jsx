@@ -6,6 +6,9 @@ import Source from "./Source";
 import Rays from "./Rays";
 import { generateRays } from "../utils/generateRays";
 import CustomAxes from "../utils/Axes";
+import axiosInstance from "../axiosApi"; 
+
+
 
 export default function Scene({ sceneData }) {
   const geomRefs = useRef([]);
@@ -22,8 +25,8 @@ export default function Scene({ sceneData }) {
           sceneData.source,
           geomRefs.current,
           sceneData.scene.geometries,
-          500,
-          50000
+          50,
+          5000
         );
         if (mounted) setRays(generated);
       } else {
@@ -45,7 +48,7 @@ export default function Scene({ sceneData }) {
       camera={{ position: [10, 4, 14], fov: 40 }}
     >
       <ambientLight intensity={0.3} />
-      <directionalLight position={[0,30000000, -150000000]} intensity={1} />
+      <directionalLight position={[0,30000000, 150000000]} intensity={1} />
       <OrbitControls />
       <CustomAxes size={30} divisions={30} />
 
@@ -58,7 +61,7 @@ export default function Scene({ sceneData }) {
       ))}
 
       <Source src={sceneData.source} />
-
+      {console.log(rays)}
       <Rays rays={rays} />
     </Canvas>
   );
