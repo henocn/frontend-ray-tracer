@@ -1,64 +1,15 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Geometry from "./Geometry";
 import Source from "./Source";
 import Rays from "./Rays";
-import { generateRays } from "../utils/generateRays";
 import CustomAxes from "../utils/Axes";
-import axiosInstance from "../axiosApi";
 
 
 
 export default function Scene({ sceneData }) {
   const geomRefs = useRef([]);
-  const [rays, setRays] = useState([]);
-
-  // useEffect(() => {
-  //   if (!sceneData) return;
-  //   let mounted = true;
-
-  //   const tryGenerate = () => {
-  //     const readyCount = geomRefs.current.filter(Boolean).length;
-  //     if (readyCount === sceneData.scene.geometries.length) {
-  //       const generated = generateRays(
-  //         sceneData.source,
-  //         geomRefs.current,
-  //         sceneData.scene.geometries,
-  //         50,
-  //         5000
-  //       );
-  //       if (mounted) setRays(generated);
-  //     } else {
-  //       setTimeout(tryGenerate, 5000);
-  //     }
-  //   };
-
-  //   tryGenerate();
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, [sceneData]);
-
-  // utilisation de l'api pour générer les rays
-  useEffect(() => {
-    if (!sceneData) return;
-    let mounted = true;
-
-    const generateRays = async () => {
-      try {
-          const response = await axiosInstance.get("/test/");
-        if (mounted) setRays(response.data.rays);
-      } catch (error) {
-        console.error("Error generating rays:", error);
-      }
-    };
-
-    generateRays();
-    return () => {
-      mounted = false;
-    };
-  }, [sceneData]);
 
   return (
     <Canvas
@@ -68,7 +19,7 @@ export default function Scene({ sceneData }) {
       camera={{ position: [10, 4, 14], fov: 40 }}
     >
       <ambientLight intensity={0.3} />
-      <directionalLight position={[0,30000000, 150000000]} intensity={1} />
+      <directionalLight position={sceneData.source.params.position || [0, 30000000, -150000000]} intensity={1} />
       <OrbitControls />
       <CustomAxes size={30} divisions={30} />
 
@@ -81,8 +32,8 @@ export default function Scene({ sceneData }) {
       ))}
 
       <Source src={sceneData.source} />
-      {console.log(rays)}
-      <Rays rays={rays} />
+      {console.log(sceneData.rays)}
+      <Rays rays={sceneData.rays} />
     </Canvas>
   );
 }
