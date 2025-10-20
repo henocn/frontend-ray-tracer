@@ -122,10 +122,9 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
     setLoading(true);
     setError(null);
     axiosInstance
-      .post("/parabolic/", data)
+      .post("/simulation/", data)
       .then((response) => {
         console.log("Réponse du serveur :", response.data);
-        // Preferer la donnée renvoyée par le serveur si disponible
         if (onApplyConfig) onApplyConfig(response.data || data);
       })
       .catch((err) => {
