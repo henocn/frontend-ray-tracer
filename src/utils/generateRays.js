@@ -59,7 +59,7 @@ export function generateRays(source, meshes, geometries, n = 10, maxAttempts = 2
   // répartir n rayons équitablement
   const nPerGeom = Math.ceil(n / pairs.length)
 
-  pairs.forEach(({ geom, mesh }, idx) => {
+  pairs.forEach(({ geom, mesh }) => {
     let attempts = 0
     let generated = 0
 

@@ -8,8 +8,13 @@ import CustomAxes from "../utils/Axes";
 
 
 
-export default function Scene({ sceneData }) {
+export default function Scene({ sceneData = {} }) {
   const geomRefs = useRef([]);
+
+  // Support both old shape (sceneData.scene.geometries) and new shape (sceneData.geometries)
+  const geometries = (sceneData?.scene?.geometries) || sceneData?.geometries || [];
+  const source = sceneData?.source || sceneData?.src || { params: { position: [0, 0, 0] } };
+  const rays = sceneData?.rays || [];
 
   return (
     <Canvas
@@ -19,21 +24,17 @@ export default function Scene({ sceneData }) {
       camera={{ position: [10, 4, 14], fov: 40 }}
     >
       <ambientLight intensity={0.3} />
-      <directionalLight position={sceneData.source.params.position || [0, 30000000, -150000000]} intensity={1} />
+      <directionalLight position={source.params.position ||[0, 30000000, -150000000]} intensity={1} />
       <OrbitControls />
       <CustomAxes size={30} divisions={30} />
 
-      {sceneData.scene.geometries.map((geom, i) => (
-        <Geometry
-          key={i}
-          ref={(el) => (geomRefs.current[i] = el)}
-          geom={geom}
-        />
-      ))}
+      {Array.isArray(geometries) &&
+        geometries.map((geom, i) => (
+          <Geometry key={i} ref={(el) => (geomRefs.current[i] = el)} geom={geom} />
+        ))}
 
-      <Source src={sceneData.source} />
-      {console.log(sceneData.rays)}
-      <Rays rays={sceneData.rays} />
+      <Source src={source} />
+      {Array.isArray(rays) && <Rays rays={rays} />}
     </Canvas>
   );
 }

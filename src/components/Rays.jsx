@@ -20,7 +20,7 @@
 import React, { useMemo } from "react";
 import * as THREE from "three";
 
-const Rays = ({ rays, color = "white", opacity = 0.5 }) => {
+const Rays = ({ rays = [], color = "white", opacity = 0.5 }) => {
   const geometry = useMemo(() => {
     const positions = [];
     rays.forEach(ray => {

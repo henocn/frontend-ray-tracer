@@ -9,7 +9,7 @@ function App() {
 
   const handleToggleTheme = () => setDarkMode(!darkMode)
   const handleChangeLang = () => alert("Langue changée !")
-  const [sceneConfig, setSceneConfig] = useState({scene: {geometries: []}, source: {}});
+  const [sceneConfig, setSceneConfig] = useState({ scene: { geometries: [] }, source: { params: { position: [0, 0, 0] } }, rays: [] });
 
   return (
     <div

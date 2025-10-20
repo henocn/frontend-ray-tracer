@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import GeometrySelection from "../sidebar/GeometrySelection";
 import SourceSelection from "../sidebar/SourceSelection";
 import ExecutionMode from "../sidebar/ExecutionMode";
 import AnalysisType from "../sidebar/AnalysisType";
 import RaysInput from "../sidebar/RaysInput";
+import axiosInstance from "../axiosApi";
 
-// Définitions des géométries et leurs paramètres par défaut
+
+
+// ---- Définition des géométries disponibles ----
 const geometryDefinitions = {
   Parabolic: { f_x: 0.5, f_y: 0.8, size: 3, position: "0,1.4,0" },
   Cylindric: { size: 2, height: 1.5, position: "0,0,0" },
@@ -14,32 +17,23 @@ const geometryDefinitions = {
 };
 
 const Sidebar = ({ darkMode, onApplyConfig }) => {
-  // ---- SOURCE ----
+  // ---- États principaux ----
   const [sourceType, setSourceType] = useState("Pointue");
   const [sourcePos, setSourcePos] = useState("0,30000000,-150000000");
   const [sourceSize, setSourceSize] = useState({ width: 1, height: 1 });
-
-  // ---- GÉOMÉTRIE ----
   const [geometryType, setGeometryType] = useState("Parabolic");
-  const [geometryParams, setGeometryParams] = useState(
-    geometryDefinitions["Parabolic"]
-  );
+  const [geometryParams, setGeometryParams] = useState(geometryDefinitions["Parabolic"]);
   const [geometryEquation, setGeometryEquation] = useState("x*x + y*y");
   const [geometries, setGeometries] = useState([]);
-
-  // ---- RAYONS ----
-  const [rayCount, setRayCount] = useState(3000);
-
-  // ---- ANALYSE ----
+  const [rayCount, setRayCount] = useState(30);
   const [analysisType, setAnalysisType] = useState("Plan");
   const [planType, setPlanType] = useState("XY");
   const [planPosition, setPlanPosition] = useState("0");
-  const [analysisEquation, setAnalysisEquation] = useState("x*x + y*y");
+  const [mode, setMode] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // ---- MODE (Séquentiel / Parallèle) ----
-  const [mode, setMode] = useState(1); // 1 = Séquentiel, 0 = Parallèle
-
-  // Changement type géométrie
+  // ---- GESTION GÉOMÉTRIE ----
   const handleGeometryTypeChange = (e) => {
     const newType = e.target.value;
     setGeometryType(newType);
@@ -47,12 +41,10 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
     if (newType === "Quelconque") setGeometryEquation("x*x + y*y");
   };
 
-  // Changement paramètre géométrie
   const handleParamChange = (key, value) => {
     setGeometryParams({ ...geometryParams, [key]: value });
   };
 
-  // Ajouter une géométrie
   const handleAddGeometry = () => {
     const id = Date.now();
     const newGeometry = {
@@ -64,79 +56,88 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
     setGeometries((prev) => [...prev, newGeometry]);
   };
 
-  // Supprimer une géométrie
   const handleRemoveGeometry = (id) => {
     setGeometries((prev) => prev.filter((g) => g.id !== id));
   };
 
-  // ---- Construire et envoyer le JSON ----
-  const handleApply = () => {
+  // ---- Construction du JSON (format simplifié) ----
+  const buildConfig = () => {
     const parsedSourcePos = sourcePos.split(",").map((v) => Number(v.trim()));
 
-    const data = {
-      analysis: {
-        type: analysisType,
-        params:
-          analysisType === "Plan"
-            ? {
-                plan: planType,
-                position: planPosition.split(",").map((v) => Number(v.trim())),
-              }
-            : {
-                equation: analysisEquation,
-              },
-      },
+    // Normaliser les paramètres numériques dans les géométries
+    const normalizeParams = (params = {}) => {
+      const out = {};
+      Object.entries(params).forEach(([k, v]) => {
+        if (typeof v === "string") {
+          // position special-case (csv)
+          if (v.includes(",") && v.split(",").every((s) => s.trim() !== "")) {
+            out[k] = v.split(",").map((x) => Number(x.trim()));
+          } else {
+            const n = Number(v);
+            out[k] = Number.isNaN(n) ? v : n;
+          }
+        } else out[k] = v;
+      });
+      return out;
+    };
+
+    return {
+      // on standardise le format : { scene: { geometries: [...] }, source: { params: {} }, rays: [...] }
       scene: {
-        geometries: geometries.map((geo) => {
-          const parsedPos = geo.params.position
-            ? geo.params.position.split(",").map((v) => Number(v.trim()))
-            : [0, 0, 0];
-
-          // Nettoyage des paramètres
-          const cleanParams = { ...geo.params, position: parsedPos };
-
-          // On ajoute equation et boundaries
-          const equation =
-            geo.type === "Quelconque"
-              ? geo.equation
-              : `z = f(${geo.type.toLowerCase()})`;
-
-          // Exemple de boundaries simples selon le "size" (juste pour test)
-          const size = geo.params.size || 5;
-          const boundaries = [
-            [-size, -size, -size],
-            [size, size, size],
-          ];
-
-          return {
-            type: geo.type,
-            params: cleanParams,
-            equation,
-            boundaries,
-          };
-        }),
+        geometries: geometries.map((geo) => ({
+          type: geo.type,
+          params: {
+            ...normalizeParams(geo.params),
+            position: geo.params?.position
+              ? geo.params.position
+                  .toString()
+                  .split(",")
+                  .map((v) => Number(v.trim()))
+              : [0, 0, 0],
+          },
+          equation: geo.equation || null,
+        })),
       },
       source: {
         type: sourceType === "Pointue" ? "Point" : "Large",
         params: {
           position: parsedSourcePos,
-          intensity: 1,
-          ...(sourceType === "Large" ? sourceSize : {}),
+          ...(sourceType === "Large" ? { size: sourceSize } : {}),
         },
       },
-      rayCount,
+      rayCount: rayCount,
+      analysis: {
+        type: analysisType,
+        plan: planType,
+        position: planPosition.split(",").map((v) => Number(v.trim())),
+      },
       mode, // 1 = séquentiel, 0 = parallèle
     };
+  };
 
-    console.log("JSON envoyé à Scene :", data);
-    if (onApplyConfig) onApplyConfig(data);
+
+  // ---- Envoi manuel (si nécessaire) ----
+  const handleApply = () => {
+    const data = buildConfig();
+    setLoading(true);
+    setError(null);
+    axiosInstance
+      .post("/parabolic/", data)
+      .then((response) => {
+        console.log("Réponse du serveur :", response.data);
+        // Preferer la donnée renvoyée par le serveur si disponible
+        if (onApplyConfig) onApplyConfig(response.data || data);
+      })
+      .catch((err) => {
+        console.error("Erreur lors de l'envoi :", err);
+        setError(err?.message || String(err));
+      })
+      .finally(() => setLoading(false));
   };
 
   // ---- Styles ----
   const sectionClass = `rounded-xl p-3 mb-4 border ${
-    darkMode
-      ? "bg-slate-800 border-slate-700"
-      : "bg-white border-slate-300 shadow-sm"
+    darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-300 shadow-sm"
   }`;
   const labelClass = "text-sm font-medium mb-1";
   const inputClass = `px-2 py-1 rounded border text-sm w-full ${
@@ -146,17 +147,11 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   return (
     <aside
       className={`w-72 h-full flex flex-col p-4 border-r overflow-y-auto transition-all duration-300
-      ${
-        darkMode
-          ? "bg-slate-900 border-slate-800 text-slate-200"
-          : "bg-slate-100 border-slate-300 text-slate-800"
-      }`}
+      ${darkMode ? "bg-slate-900 border-slate-800 text-slate-200" : "bg-slate-100 border-slate-300 text-slate-800"}
+      `}
     >
-      <h2 className="text-lg font-semibold mb-4 text-orange-400">
-        Configuration
-      </h2>
+      <h2 className="text-lg font-semibold mb-4 text-orange-400">Configuration</h2>
 
-      {/* ---- TYPE D’ANALYSE ---- */}
       <AnalysisType
         sectionClass={sectionClass}
         analysisType={analysisType}
@@ -165,20 +160,12 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         setPlanType={setPlanType}
         planPosition={planPosition}
         setPlanPosition={setPlanPosition}
-        analysisEquation={analysisEquation}
-        setAnalysisEquation={setAnalysisEquation}
         labelClass={labelClass}
         inputClass={inputClass}
       />
 
-      {/* ---- EXECUTION MODE ---- */}
-      <ExecutionMode
-        sectionClass={sectionClass}
-        mode={mode}
-        setMode={setMode}
-      />
+      <ExecutionMode sectionClass={sectionClass} mode={mode} setMode={setMode} />
 
-      {/* ---- SOURCE ---- */}
       <SourceSelection
         sectionClass={sectionClass}
         labelClass={labelClass}
@@ -191,7 +178,6 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         setSourceSize={setSourceSize}
       />
 
-      {/* ---- GÉOMÉTRIE ---- */}
       <GeometrySelection
         labelClass={labelClass}
         inputClass={inputClass}
@@ -209,7 +195,6 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         onRemoveGeometry={handleRemoveGeometry}
       />
 
-      {/* ---- RAYONS ---- */}
       <RaysInput
         sectionClass={sectionClass}
         labelClass={labelClass}
@@ -218,17 +203,18 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         setRayCount={setRayCount}
       />
 
-      {/* ---- APPLY ---- */}
-      <button
-        onClick={handleApply}
-        className={`mt-2 px-3 py-2 rounded font-medium text-sm ${
-          darkMode
-            ? "bg-orange-600 hover:bg-orange-500 text-white"
-            : "bg-orange-500 hover:bg-orange-400 text-white"
-        }`}
-      >
-        Appliquer la configuration
-      </button>
+      <div className="mt-2">
+        <button
+          onClick={handleApply}
+          disabled={loading}
+          className={`w-full px-3 py-2 rounded font-medium text-sm ${
+            darkMode ? "bg-orange-600 hover:bg-orange-500 text-white" : "bg-orange-500 hover:bg-orange-400 text-white"
+          } ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+        >
+          {loading ? "Envoi..." : "Appliquer la configuration"}
+        </button>
+  {error && <p className="text-sm text-red-400 mt-2">Erreur: {String(error)}</p>}
+      </div>
     </aside>
   );
 };
