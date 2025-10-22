@@ -6,11 +6,9 @@ import AnalysisType from "../sidebar/AnalysisType";
 import RaysInput from "../sidebar/RaysInput";
 import axiosInstance from "../axiosApi";
 
-
-
 // ---- Définition des géométries disponibles ----
 const geometryDefinitions = {
-  Parabolic: { f_x: 0.5, f_y: 0.8, size: 3, position: "0,1.4,0" },
+  Parabolic: { f_x: 0.5, f_y: 0.8, h: 3, position: "0,1.4,0" },
   Cylindric: { size: 2, height: 1.5, position: "0,0,0" },
   RingArray: { innerRadius: 1, outerRadius: 2, count: 8, position: "0,0,0" },
   Quelconque: { equation: "x*x + y*y", position: "0,0,0" },
@@ -19,13 +17,15 @@ const geometryDefinitions = {
 const Sidebar = ({ darkMode, onApplyConfig }) => {
   // ---- États principaux ----
   const [sourceType, setSourceType] = useState("Pointue");
-  const [sourcePos, setSourcePos] = useState("0,30000000,-150000000");
+  const [sourcePos, setSourcePos] = useState("0,0,150000000");
   const [sourceSize, setSourceSize] = useState({ width: 1, height: 1 });
   const [geometryType, setGeometryType] = useState("Parabolic");
-  const [geometryParams, setGeometryParams] = useState(geometryDefinitions["Parabolic"]);
+  const [geometryParams, setGeometryParams] = useState(
+    geometryDefinitions["Parabolic"]
+  );
   const [geometryEquation, setGeometryEquation] = useState("x*x + y*y");
   const [geometries, setGeometries] = useState([]);
-  const [rayCount, setRayCount] = useState(30);
+  const [rayCount, setRayCount] = useState(8);
   const [analysisType, setAnalysisType] = useState("Plan");
   const [planType, setPlanType] = useState("XY");
   const [planPosition, setPlanPosition] = useState("0");
@@ -82,22 +82,19 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
     };
 
     return {
-      // on standardise le format : { scene: { geometries: [...] }, source: { params: {} }, rays: [...] }
-      scene: {
-        geometries: geometries.map((geo) => ({
-          type: geo.type,
-          params: {
-            ...normalizeParams(geo.params),
-            position: geo.params?.position
-              ? geo.params.position
-                  .toString()
-                  .split(",")
-                  .map((v) => Number(v.trim()))
-              : [0, 0, 0],
-          },
-          equation: geo.equation || null,
-        })),
-      },
+      geometries: geometries.map((geo) => ({
+        type: geo.type,
+        params: {
+          ...normalizeParams(geo.params),
+          position: geo.params?.position
+            ? geo.params.position
+                .toString()
+                .split(",")
+                .map((v) => Number(v.trim()))
+            : [0, 0, 0],
+        },
+      })),
+
       source: {
         type: sourceType === "Pointue" ? "Point" : "Large",
         params: {
@@ -116,9 +113,9 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   };
 
 
-  // ---- Envoi manuel (si nécessaire) ----
   const handleApply = () => {
     const data = buildConfig();
+    console.log("Envoi de la configuration :", data);
     setLoading(true);
     setError(null);
     axiosInstance
@@ -136,7 +133,9 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
 
   // ---- Styles ----
   const sectionClass = `rounded-xl p-3 mb-4 border ${
-    darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-300 shadow-sm"
+    darkMode
+      ? "bg-slate-800 border-slate-700"
+      : "bg-white border-slate-300 shadow-sm"
   }`;
   const labelClass = "text-sm font-medium mb-1";
   const inputClass = `px-2 py-1 rounded border text-sm w-full ${
@@ -146,10 +145,16 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
   return (
     <aside
       className={`w-72 h-full flex flex-col p-4 border-r overflow-y-auto transition-all duration-300
-      ${darkMode ? "bg-slate-900 border-slate-800 text-slate-200" : "bg-slate-100 border-slate-300 text-slate-800"}
+      ${
+        darkMode
+          ? "bg-slate-900 border-slate-800 text-slate-200"
+          : "bg-slate-100 border-slate-300 text-slate-800"
+      }
       `}
     >
-      <h2 className="text-lg font-semibold mb-4 text-orange-400">Configuration</h2>
+      <h2 className="text-lg font-semibold mb-4 text-orange-400">
+        Configuration
+      </h2>
 
       <AnalysisType
         sectionClass={sectionClass}
@@ -163,7 +168,11 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
         inputClass={inputClass}
       />
 
-      <ExecutionMode sectionClass={sectionClass} mode={mode} setMode={setMode} />
+      <ExecutionMode
+        sectionClass={sectionClass}
+        mode={mode}
+        setMode={setMode}
+      />
 
       <SourceSelection
         sectionClass={sectionClass}
@@ -207,12 +216,16 @@ const Sidebar = ({ darkMode, onApplyConfig }) => {
           onClick={handleApply}
           disabled={loading}
           className={`w-full px-3 py-2 rounded font-medium text-sm ${
-            darkMode ? "bg-orange-600 hover:bg-orange-500 text-white" : "bg-orange-500 hover:bg-orange-400 text-white"
+            darkMode
+              ? "bg-orange-600 hover:bg-orange-500 text-white"
+              : "bg-orange-500 hover:bg-orange-400 text-white"
           } ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
         >
           {loading ? "Envoi..." : "Appliquer la configuration"}
         </button>
-  {error && <p className="text-sm text-red-400 mt-2">Erreur: {String(error)}</p>}
+        {error && (
+          <p className="text-sm text-red-400 mt-2">Erreur: {String(error)}</p>
+        )}
       </div>
     </aside>
   );

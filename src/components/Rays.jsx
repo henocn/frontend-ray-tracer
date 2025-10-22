@@ -22,8 +22,9 @@ import * as THREE from "three";
 
 const Rays = ({ rays = [], color = "white", opacity = 0.5 }) => {
   const geometry = useMemo(() => {
+    console.log("Rays data received in Rays component:", rays);
     const positions = [];
-    rays.forEach(ray => {
+    rays?.forEach(ray => {
       const [start, end] = ray.points;
       positions.push(...start, ...end);
     });
