@@ -25,8 +25,8 @@ const Rays = ({ rays = [], color = "white", opacity = 0.5 }) => {
     console.log("Rays data received in Rays component:", rays);
     const positions = [];
     rays?.forEach(ray => {
-      const [start, end] = ray.points;
-      positions.push(...start, ...end);
+      const [start, end] = ray;
+      if (start && end) positions.push(...start, ...end);
     });
 
     const geom = new THREE.BufferGeometry();
