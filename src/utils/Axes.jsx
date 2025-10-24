@@ -2,7 +2,7 @@ import React from "react";
 import * as THREE from "three";
 import { Text } from "@react-three/drei";
 
-export default function CustomAxes({ size = 5, divisions = 10 }) {
+export default function CustomAxes({ size = 5, divisions = 10, position = [0, 0, 0] }) {
   const arrowSize = 0.3;
 
   const axes = [
@@ -12,7 +12,7 @@ export default function CustomAxes({ size = 5, divisions = 10 }) {
   ];
 
   return (
-    <group>
+    <group position={position}>
       {/* Flèches et labels */}
       {axes.map(({ dir, color, label }) => {
         const dirVec = new THREE.Vector3(...dir);
@@ -38,7 +38,7 @@ export default function CustomAxes({ size = 5, divisions = 10 }) {
       })}
 
   {/* Grille au sol (placée sur le plan XY quand Z est vertical) */}
-  <gridHelper rotation={[Math.PI / 2, 0, 0]} args={[size * 2, divisions, 0x888888, 0x444444]} />
+      <gridHelper rotation={[Math.PI / 2, 0, 0]} args={[size * 2, divisions, 0x888888, 0x444444]} />
     </group>
   );
 }
