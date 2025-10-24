@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Canvas } from "@react-three/fiber";
+import React, { useRef, useEffect } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Geometry from "./Geometry";
 import Source from "./Source";
@@ -10,6 +10,17 @@ import CustomAxes from "../utils/Axes";
 
 export default function Scene({ sceneData = {} }) {
   const geomRefs = useRef([]);
+  function ZUpSetter() {
+    const { scene, camera } = useThree();
+    useEffect(() => {
+      if (scene && camera) {
+        scene.up.set(0, 0, 1);
+        camera.up.set(0, 0, 1);
+        if (typeof camera.updateProjectionMatrix === "function") camera.updateProjectionMatrix();
+      }
+    }, [scene, camera]);
+    return null;
+  }
 
   // Support both old shape (sceneData.scene.geometries) and new shape (sceneData.geometries)
   const geometries = (sceneData?.scene?.geometries) || sceneData?.geometries || [];

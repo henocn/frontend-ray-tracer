@@ -37,8 +37,8 @@ export default function CustomAxes({ size = 5, divisions = 10 }) {
         );
       })}
 
-      {/* Grille au sol */}
-      <gridHelper args={[size * 2, divisions, 0x888888, 0x444444]} />
+  {/* Grille au sol (placée sur le plan XY quand Z est vertical) */}
+  <gridHelper rotation={[Math.PI / 2, 0, 0]} args={[size * 2, divisions, 0x888888, 0x444444]} />
     </group>
   );
 }

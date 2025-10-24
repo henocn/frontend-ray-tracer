@@ -57,8 +57,9 @@ const Parabolic = forwardRef(({ params = {}, equation, boundaries }, ref) => {
           if (!Number.isFinite(z)) {
             z = (x * x) / (4 * f_x) + (y * y) / (4 * f_y)
           }
-        } catch (e) {
+        } catch (err) {
           // fallback to parabolic formula
+          console.warn('Parabolic: error evaluating expression', err)
           z = (x * x) / (4 * f_x) + (y * y) / (4 * f_y)
         }
       } else {
