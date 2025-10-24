@@ -22,7 +22,7 @@ export default function Scene({ sceneData = {} }) {
     return null;
   }
 
-  // Use default OrbitControls (no cursor-centered zoom)
+  
 
   // Support both old shape (sceneData.scene.geometries) and new shape (sceneData.geometries)
   const geometries = (sceneData?.scene?.geometries) || sceneData?.geometries || [];
@@ -34,13 +34,13 @@ export default function Scene({ sceneData = {} }) {
       style={{
         background: "linear-gradient(to bottom, #766e9bff, #141430ff)",
       }}
-      camera={{ position: [10, 4, 12], fov: 40 }}
+      camera={{ position: [10, 4, 14], fov: 40 }}
     >
   <ZUpSetter />
   <ambientLight intensity={0.3} />
   <directionalLight position={source.params.position || [0, 30000000, -150000000]} intensity={1} />
   <OrbitControls enableDamping={true} dampingFactor={0.08} screenSpacePanning={false} makeDefault={true} />
-      <CustomAxes position={[0, 0, -1]} size={30} divisions={30} />
+      <CustomAxes size={30} divisions={30} />
 
       {Array.isArray(geometries) &&
         geometries.map((geom, i) => (
